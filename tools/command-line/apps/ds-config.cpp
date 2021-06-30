@@ -20,6 +20,7 @@
 
 #define BUILD_FOR_CRU 1
 #define BUILD_FOR_ALF 1
+//#define PARALLEL 1
 
 #include "../src/Sca/cern/hdlc_cern_me.hpp"
 #include "../src/Sca/hdlc_alf.hpp"
@@ -28,11 +29,92 @@
 
 using namespace o2::alf;
 
+static bool success = {true};
+
+
+struct DsConfig
+{
+  DsConfig(int id, std::string c0, std::string c1): dsId(id), cf0(c0), cf1(c1) { }
+  int dsId;
+  std::string cf0;
+  std::string cf1;
+};
+
+
+void fecConfig(int fec_idx, o2::alf::roc::Parameters::CardIdType cardId1, o2::alf::roc::Parameters::CardIdType cardId2, std::vector<DsConfig>* dsConfigVec)
+{
+  try {
+#ifdef BUILD_FOR_ALF
+    o2::alf::roc::Parameters::CardIdType cardId = (fec_idx < 12) ? cardId1 : cardId2;
+    int linkId = fec_idx % 12;
+    std::unique_ptr<cru::HdlcAlf> hdlc_core(new cru::HdlcAlf(cardId, linkId, true));
+    //cru::HdlcAlf* hdlc_core = new cru::HdlcAlf(cardId, fec_idx, true);
+#else
+    std::unique_ptr<common::Bar> bar;
+    try {
+      bar.reset(common::BarFactory::makeBar(argv[1], 2));
+    } catch (std::exception& e) {
+      std::cerr << e.what() << std::endl;
+      exit(1);
+    }
+    std::unique_ptr<common::HdlcCore> hdlc_core(common::HdlcFactory::makeHdlcCore(*(bar.get()), fec_idx, true));
+#endif
+    //std::cout<<"HDLC core created\n";
+    hdlc_core->rst();
+    //std::cout<<"HDLC core resetted\n";
+    //continue;
+
+    DsFec fec(*(hdlc_core.get()), 0);
+    //DsFec fec(*(hdlc_core), 0);
+    //std::cout<<"FEC board created\n";
+    fec.init();
+    //exit(0);
+
+    //std::cout << "Reading the FEC unique ID" << std::endl;
+    //fec.readUniqueID(&std::cout);
+    //continue;
+
+    bool readback = true;
+    int retries = 3; //10;
+
+    for(auto cfg : *dsConfigVec) {
+
+      auto ds_idx = cfg.dsId;
+      auto cf0 = cfg.cf0;
+      auto cf1 = cfg.cf1;
+
+      for(int iter = 0; iter < 1; iter++) {
+        //std::cout << "Loading SAMPA registers" << std::endl;
+        if( !fec.sampaConfigure(cf0, ds_idx*2, retries, readback, &std::cout) ) {
+          std::cout << "ERROR: Configuration of SAMPA chip " << fec_idx << ":" << ds_idx*2
+              << " (LINK " << fec_idx << " J" << ds_idx/5 + 1 << " DS" << (ds_idx%5) << ") failed" << std::endl << std::endl;
+          success = false;
+          break;
+        }
+        //std::cout<<"SAMPA "<< fec_idx << ":" << ds_idx*2<<" succesfully configured\n";
+        if( !fec.sampaConfigure(cf1, ds_idx*2+1, retries, readback, &std::cout) ) {
+          std::cout << "ERROR: Configuration of SAMPA chip " << fec_idx << ":" << ds_idx*2+1
+              << " (LINK " << fec_idx << " J" << ds_idx/5 + 1 << " DS" << (ds_idx%5) << ") failed" << std::endl << std::endl;
+          success = false;
+          break;
+        }
+        //std::cout<<"SAMPA "<< fec_idx << ":" << ds_idx*2+1<<" succesfully configured\n";
+      }
+    }
+    //delete hdlc_core;
+    //if( !success ) break;
+  }
+  catch (std::runtime_error& e) {
+    std::cerr << e.what() << std::endl;
+    success = false;
+    //exit(100);
+  }
+
+}
+
 
 int main(int argc, char** argv)
 {
-  bool success = true;
-
   o2::alf::roc::PciAddress pci_addr1(argv[1]);
   o2::alf::roc::PciAddress pci_addr2(argv[2]);
   o2::alf::roc::Parameters::CardIdType cardId1 = pci_addr1;
@@ -53,6 +135,8 @@ int main(int argc, char** argv)
   }
 #endif*/
 
+  std::vector<DsConfig> dsConfigVec[24];
+
   std::ifstream istr(argv[3]);
   char tstr[501];
   //while( istr.getline(tstr,500) ) {
@@ -67,70 +151,29 @@ int main(int argc, char** argv)
     std::cout<<"fec_idx="<<fec_idx<<"  ds_idx="<<ds_idx<<"  \""<<cf0<<"\"  \""<<cf1<<"\""<<std::endl;
     if( !istr ) break;
 
-    //auto sca = o2::alf::Sca(cardId, fec_idx);
-    //sca.svlReset();
-    //sca.svlConnect();
-
-    try {
-#ifdef BUILD_FOR_ALF
-      o2::alf::roc::Parameters::CardIdType cardId = (fec_idx < 12) ? cardId1 : cardId2;
-      fec_idx = fec_idx % 12;
-      std::unique_ptr<cru::HdlcAlf> hdlc_core(new cru::HdlcAlf(cardId, fec_idx, true));
-      //cru::HdlcAlf* hdlc_core = new cru::HdlcAlf(cardId, fec_idx, true);
-#else
-      std::unique_ptr<common::Bar> bar;
-      try {
-        bar.reset(common::BarFactory::makeBar(argv[1], 2));
-      } catch (std::exception& e) {
-        std::cerr << e.what() << std::endl;
-        exit(1);
-      }
-      std::unique_ptr<common::HdlcCore> hdlc_core(common::HdlcFactory::makeHdlcCore(*(bar.get()), fec_idx, true));
-#endif
-      //std::cout<<"HDLC core created\n";
-      hdlc_core->rst();
-      //std::cout<<"HDLC core resetted\n";
-      //continue;
-      
-      DsFec fec(*(hdlc_core.get()), 0);
-      //DsFec fec(*(hdlc_core), 0);
-      //std::cout<<"FEC board created\n";
-      fec.init();
-      //exit(0);
-      
-      //std::cout << "Reading the FEC unique ID" << std::endl;
-      //fec.readUniqueID(&std::cout);
-      //continue;
-
-      bool readback = true;
-      int retries = 3; //10;
-
-      for(int iter = 0; iter < 1; iter++) {
-        //std::cout << "Loading SAMPA registers" << std::endl;
-        if( !fec.sampaConfigure(cf0, ds_idx*2, retries, readback, &std::cout) ) {
-          std::cout << "ERROR: Configuration of SAMPA chip " << fec_idx << ":" << ds_idx*2
-              << " (LINK " << fec_idx << " J" << ds_idx/5 + 1 << " DS" << (ds_idx%5) << ") failed" << std::endl << std::endl;
-          success = false;
-          break;
-        }
-        //std::cout<<"SAMPA "<< fec_idx << ":" << ds_idx*2<<" succesfully configured\n";
-        if( !fec.sampaConfigure(cf1, ds_idx*2+1, retries, readback, &std::cout) ) {
-          std::cout << "ERROR: Configuration of SAMPA chip " << fec_idx << ":" << ds_idx*2+1
-              << " (LINK " << fec_idx << " J" << ds_idx/5 + 1 << " DS" << (ds_idx%5) << ") failed" << std::endl << std::endl;
-          success = false;
-          break;
-        }
-        //std::cout<<"SAMPA "<< fec_idx << ":" << ds_idx*2+1<<" succesfully configured\n";
-      }
-      //delete hdlc_core;
-      //if( !success ) break;
-    }
-    catch (std::runtime_error& e) {
-      std::cerr << e.what() << std::endl;
-      success = false;
-      //exit(100);
-    }
+    dsConfigVec[fec_idx].emplace_back(ds_idx, cf0, cf1);
   }
+
+#ifdef PARALLEL
+  std::vector<std::thread> workers;
+  for(int fec_idx = 0; fec_idx < 24; fec_idx++) {
+    workers.push_back(std::thread(fecConfig,
+        fec_idx,
+        cardId1,
+        cardId2,
+        &(dsConfigVec[fec_idx])));
+  }
+  for(auto& t : workers) {
+    t.join();
+  }
+#else
+  for(int fec_idx = 0; fec_idx < 24; fec_idx++) {
+    fecConfig(fec_idx, cardId1, cardId2, &(dsConfigVec[fec_idx]));
+    printf("Link %d configured\n",fec_idx);
+    //getchar();
+  }
+#endif
+
   printf("success: %d\n", success);
 
   if( !success ) return 1;
