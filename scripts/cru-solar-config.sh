@@ -20,10 +20,16 @@ bash ./cru-get-ds-enabled.sh $CRU
 
 #export CRU
 
-# program the SOLAR boards
-result=0
-NLINKS=$(echo "${CRU_LINKS1}" | tr "," "\n" | wc -l)
-for L in $(seq 1 $NLINKS); do
+
+REGFILE=gbtx-regs-${CRU}.txt
+#rm -f "$REGFILE"
+
+
+if [ ! -e $REGFILE -o $REGFILE -ot board-enable-${CRU}.txt ]; then
+
+    result=0
+    NLINKS=$(echo "${CRU_LINKS1}" | tr "," "\n" | wc -l)
+    for L in $(seq 1 $NLINKS); do
 
 	LINK=$(echo "${CRU_LINKS1}" | tr "," "\n" | sed -n ${L}p)
 	echo "LINK: $LINK"
@@ -31,21 +37,23 @@ for L in $(seq 1 $NLINKS); do
 
 	if [ $TGTLINK -ge 0 -a x"$TGTLINK" != x"$LINK" ]; then continue; fi
 
-	#TEST_DOWN=$(./link_status.sh ${LINK} | grep DOWN)
-	#if [ -n "${TEST_DOWN}" ]; then continue; fi
-
-	#bash ./link_is_up.sh ${CRU_ADDR} ${LINK}
-	#ISDOWN=$?
-	#if [ $ISDOWN -eq 1 ]; then continue; fi
-
 	echo "./solar-config.sh ${CRU} $LINK"
-	bash ./solar-config.sh ${CRU} $LINK
+	bash ./solar-config.sh ${CRU} $LINK $REGFILE
 	result=$?
 	if [ x"$result" != "x0" ]; then
 	    break
 	fi
 
-done
+    done
+
+fi
+
+GBTCMD=../tools/command-line/build/gbt-config
+
+echo "Configuring ${CRU}/${CRU_PCI_ADDR}"
+echo "$GBTCMD ${CRU_PCI_ADDR1} ${CRU_PCI_ADDR2} \"f\" \"$REGFILE\""
+$GBTCMD ${CRU_PCI_ADDR1} ${CRU_PCI_ADDR2} "f" "$REGFILE" || exit 1
+
 
 sleep 1
 

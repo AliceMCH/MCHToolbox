@@ -39,3 +39,10 @@
 
 # cmake build folders
 tools/command-line/build
+
+# temporary configuration files
+scripts/board_enable-*.txt
+scripts/board-enable-*.txt
+scripts/config_sampa*.txt
+scripts/solar-clock-phase-*.txt
+scripts/gbtx-regs-*.txt

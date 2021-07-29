@@ -2,17 +2,10 @@
 
 CRU=$1
 LINKID=$2
+REGFILE=$3
 
 SCRIPTDIR=$(readlink -f $(dirname $0))
 source ${SCRIPTDIR}/env-${CRU}.sh
-
-
-
-#GBTCMD=../GBT_IC/build/gbt-ic
-#GBTCMD=../GBT_IC-mt/build/gbt-ic
-#(cd ../GBT_IC-mt/build && make) || exit 1
-
-GBTCMD=../tools/command-line/build/gbt-config
 
 
 #PATT1=10101
@@ -68,18 +61,15 @@ echo -n "J8: "; echo -n "$PATT" | cut -c 1-5
 #exit
 
 
-REGFILE=gbtx-regs-${CRU}-${LINKID}.txt
-rm -f "$REGFILE"
-
 #echo "../GBT_IC/build/gbt-ic ${CRU_PCI_ADDR} w ${LINKID} 35 $(( 16#42 ))"
 #../GBT_IC/build/gbt-ic ${CRU_PCI_ADDR} "w" ${LINKID} 35 $(( 16#42 ))
-echo "35 $(( 16#42 ))" >> "$REGFILE"
+echo "${LINKID} 35 $(( 16#42 ))" >> "$REGFILE"
 
 # clock enable
 for reg in 255 333 348; do
     for iter in $(seq 1 5); do
 	#../GBT_IC/build/gbt-ic ${CRU_PCI_ADDR} "w" ${LINKID} $reg 255
-	echo "$reg 255" >> "$REGFILE"
+	echo "${LINKID} $reg 255" >> "$REGFILE"
 	reg=$((reg+3))
     done
 done
@@ -94,13 +84,13 @@ for reg in 81 82 83; do
 	#echo "I $iter  P: $P"
 	#echo "INPATTREG: $INPATTREG"
 	#../GBT_IC/build/gbt-ic ${CRU_PCI_ADDR} "w" ${LINKID} $reg 255
-	echo "$reg $INPATTREG" >> "$REGFILE"
+	echo "${LINKID} $reg $INPATTREG" >> "$REGFILE"
 	#echo "$reg $INPATTREG"
 	reg=$((reg+24))
     done
     for iter in $(seq 6 5); do
 	#../GBT_IC/build/gbt-ic ${CRU_PCI_ADDR} "w" ${LINKID} $reg 255
-	echo "$reg 0" >> "$REGFILE"
+	echo "${LINKID} $reg 0" >> "$REGFILE"
 	reg=$((reg+24))
     done
 done
@@ -110,7 +100,7 @@ done
 for reg in 256 334 349; do
     for iter in $(seq 1 5); do
 	#../GBT_IC/build/gbt-ic ${CRU_PCI_ADDR} "w" ${LINKID} $reg 255
-	echo "$reg 255" >> "$REGFILE"
+	echo "${LINKID} $reg 255" >> "$REGFILE"
 	reg=$((reg+3))
     done
 done
@@ -124,25 +114,25 @@ done
 # output mode and clock frequency
 for reg in 332 335 338 341 344 347 350 353 356 359; do
     #../GBT_IC/build/gbt-ic ${CRU_PCI_ADDR} "w" ${LINKID} $reg 5
-    echo "$reg 5" >> "$REGFILE"
+    echo "${LINKID} $reg 5" >> "$REGFILE"
 done
 
 
 # set output power to maximum
 for reg in 327 328 329 330 331; do
-    echo "$reg 0" >> "$REGFILE"
+    echo "${LINKID} $reg 0" >> "$REGFILE"
     #echo "$reg 170" >> "$REGFILE"
 done
 
 
 # e-ports DLL configuration
 for reg in 64 88 112 136 160 184 208; do
-    echo "$reg $(( 16#BB ))" >> "$REGFILE"
-    echo "$((reg+1)) $(( 16#B ))" >> "$REGFILE"
+    echo "${LINKID} $reg $(( 16#BB ))" >> "$REGFILE"
+    echo "${LINKID} $((reg+1)) $(( 16#B ))" >> "$REGFILE"
 done
 
 for reg in 84 85 86 108 109 110 132 133 134 156 157 158 180 181 182 204 205 206 228 229 230; do
-    echo "$reg 255" >> "$REGFILE"
+    echo "${LINKID} $reg 255" >> "$REGFILE"
 done
 
 CLOCK_PHASE_FILE="GBT Clock Phases/solar-clock-phase-${CRU}-${LINKID}.txt"
@@ -150,7 +140,7 @@ if [ -e "${CLOCK_PHASE_FILE}" ]; then
     echo "Reading clock phases from \"${CLOCK_PHASE_FILE}\""
 
     # set the phase tracking mode to static
-    echo "62 0" >> "$REGFILE"
+    echo "${LINKID} 62 0" >> "$REGFILE"
 
     # Phase-Aligners DLL reset
     #for reg in 65 89 113 137 161 185 209; do
@@ -166,33 +156,27 @@ if [ -e "${CLOCK_PHASE_FILE}" ]; then
 	PHASE1=$(cat "${CLOCK_PHASE_FILE}" | cut -d" " -f $I)
 	PHASE2=$(cat "${CLOCK_PHASE_FILE}" | cut -d" " -f $((I+1)))
 	VAL=$(echo "ibase=16; ${PHASE2}${PHASE1}" | bc)
-	echo "$reg $VAL" >> "$REGFILE"
-	echo "$((reg+4)) $VAL" >> "$REGFILE"
-	echo "$((reg+8)) $VAL" >> "$REGFILE"
+	echo "${LINKID} $reg $VAL" >> "$REGFILE"
+	echo "${LINKID} $((reg+4)) $VAL" >> "$REGFILE"
+	echo "${LINKID} $((reg+8)) $VAL" >> "$REGFILE"
 
 	I=$((I+2))
     done
 else
     echo "Clock phases not found, starting automatic phase alignment"
 
-    echo "62 42" >> "$REGFILE"
+    echo "${LINKID} 62 42" >> "$REGFILE"
 
     # Phase-Aligners DLL reset
     #for reg in 65 89 113 137 161 185 209; do
-    #echo "$reg $(( 16#70 ))" >> "$REGFILE"
+    #echo "${LINKID} $reg $(( 16#70 ))" >> "$REGFILE"
     #done
     #for reg in 65 89 113 137 161 185 209; do
-    #echo "$reg $(( 16#B ))" >> "$REGFILE"
+    #echo "${LINKID} $reg $(( 16#B ))" >> "$REGFILE"
     #done
 
     for reg in 84 85 86 108 109 110 132 133 134 156 157 158 180 181 182 204 205 206 228 229 230; do
-	echo "$reg 0" >> "$REGFILE"
+	echo "${LINKID} $reg 0" >> "$REGFILE"
     done
 fi
 
-echo "Configuring ${CRU}/${CRU_PCI_ADDR}/${LINKID}"
-echo "$GBTCMD ${CRU_PCI_ADDR1} ${CRU_PCI_ADDR2} \"f\" ${LINKID} \"$REGFILE\""
-$GBTCMD ${CRU_PCI_ADDR1} ${CRU_PCI_ADDR2} "f" ${LINKID} "$REGFILE" || exit 1
-
-
-#python gbtx_set_regs.py 3b:0.0 ${GBT_CH} "$REGFILE"

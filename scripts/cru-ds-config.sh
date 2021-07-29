@@ -58,6 +58,7 @@ fi
 
 NENABLED=0
 NDISABLED=0
+CFGFILE=/tmp/ds-config-${CRU}.txt
 rm -f ds_config.txt
 for CRU_LINK in $(seq 0 23); do
     for DS in $(seq 0 39); do
@@ -70,7 +71,7 @@ for CRU_LINK in $(seq 0 23); do
 	if [ x"$PEDESTALS" != "x1" ]; then
 	    cp config_sampa_0.txt /tmp/config_sampa_${CRU_LINK}_${DS}_0.txt
 	    cp config_sampa_1.txt /tmp/config_sampa_${CRU_LINK}_${DS}_1.txt
-	    echo "${CRU_LINK} ${DS}  /tmp/config_sampa_${CRU_LINK}_${DS}_0.txt /tmp/config_sampa_${CRU_LINK}_${DS}_1.txt" >> ds_config.txt
+	    echo "${CRU_LINK} ${DS}  /tmp/config_sampa_${CRU_LINK}_${DS}_0.txt /tmp/config_sampa_${CRU_LINK}_${DS}_1.txt" >> $CFGFILE
 
 	    # mute noisy channels
 	    CHLIST=""
@@ -97,7 +98,7 @@ for CRU_LINK in $(seq 0 23); do
 		done
 	    fi
 	else
-	    echo "${CRU_LINK} ${DS} config_sampa_0.txt config_sampa_1.txt" >> ds_config.txt
+	    echo "${CRU_LINK} ${DS} config_sampa_0.txt config_sampa_1.txt" >> $CFGFILE
 	fi
 
 	CRU_LINK2=$(echo "scale=0; ${CRU_LINK}%12" | bc -l)
@@ -112,8 +113,8 @@ for I in $(seq 1 1); do
     #time ../alice-tpc-fec-utils-mt/build/src/cru/tdsinit "${CRU_PCI_ADDR}" ds_config.txt >& sampa_load.log
     #echo "../alice-tpc-fec-utils/build/src/cru/tdsinit "${CRU_PCI_ADDR}" ds_config.txt"
     #time ../alice-tpc-fec-utils/build/src/cru/tdsinit "${CRU_PCI_ADDR}" ds_config.txt $RETRIES >& sampa_load.log
-    echo "../tools/command-line/build/ds-init \"${CRU_PCI_ADDR1}\" \"${CRU_PCI_ADDR2}\" ds_config.txt"
-    time ../tools/command-line/build/ds-config "${CRU_PCI_ADDR1}" "${CRU_PCI_ADDR2}" ds_config.txt $RETRIES >& sampa_load.log
+    echo "../tools/command-line/build/ds-init \"${CRU_PCI_ADDR1}\" \"${CRU_PCI_ADDR2}\" $CFGFILE $RETRIES"
+    time ../tools/command-line/build/ds-config "${CRU_PCI_ADDR1}" "${CRU_PCI_ADDR2}" $CFGFILE $RETRIES >& sampa_load.log
     RET=$?
     if [ x"$RET" = "x0" ]; then
         echo "$NENABLED sampa boards configured"

@@ -1,5 +1,4 @@
-
-#// Copyright CERN and copyright holders of ALICE O2. This software is
+// Copyright CERN and copyright holders of ALICE O2. This software is
 // distributed under the terms of the GNU General Public License v3 (GPL
 // Version 3), copied verbatim in the file "COPYING".
 //
@@ -16,6 +15,7 @@
 
 #include <chrono>
 #include <thread>
+#include <mutex>
 #include <vector>
 
 #define BUILD_FOR_CRU 1
@@ -31,6 +31,7 @@ using namespace o2::alf;
 
 static bool success = {true};
 
+static std::mutex gCardIdMutex;
 
 struct DsConfig
 {
@@ -41,14 +42,23 @@ struct DsConfig
 };
 
 
-void fecConfig(int fec_idx, o2::alf::roc::Parameters::CardIdType cardId1, o2::alf::roc::Parameters::CardIdType cardId2, std::vector<DsConfig>* dsConfigVec)
+void fecConfig(int fec_idx, std::string pci_addr_str1, std::string pci_addr_str2, std::vector<DsConfig>* dsConfigVec)
 {
+  o2::alf::roc::PciAddress pci_addr1(pci_addr_str1);
+  o2::alf::roc::PciAddress pci_addr2(pci_addr_str2);
+  o2::alf::roc::Parameters::CardIdType cardId1 = pci_addr1;
+  o2::alf::roc::Parameters::CardIdType cardId2 = pci_addr2;
+  //return;
+  if (dsConfigVec->empty()) { return; }
   try {
 #ifdef BUILD_FOR_ALF
-    o2::alf::roc::Parameters::CardIdType cardId = (fec_idx < 12) ? cardId1 : cardId2;
+    gCardIdMutex.lock();
+    o2::alf::roc::Parameters::CardIdType& cardId = (fec_idx < 12) ? cardId1 : cardId2;
+    //return;
     int linkId = fec_idx % 12;
     std::unique_ptr<cru::HdlcAlf> hdlc_core(new cru::HdlcAlf(cardId, linkId, true));
     //cru::HdlcAlf* hdlc_core = new cru::HdlcAlf(cardId, fec_idx, true);
+    gCardIdMutex.unlock();
 #else
     std::unique_ptr<common::Bar> bar;
     try {
@@ -59,14 +69,16 @@ void fecConfig(int fec_idx, o2::alf::roc::Parameters::CardIdType cardId1, o2::al
     }
     std::unique_ptr<common::HdlcCore> hdlc_core(common::HdlcFactory::makeHdlcCore(*(bar.get()), fec_idx, true));
 #endif
+    //return;
     //std::cout<<"HDLC core created\n";
     hdlc_core->rst();
     //std::cout<<"HDLC core resetted\n";
-    //continue;
+    //return;
 
     DsFec fec(*(hdlc_core.get()), 0);
     //DsFec fec(*(hdlc_core), 0);
     //std::cout<<"FEC board created\n";
+    //return;
     fec.init();
     //exit(0);
 
@@ -115,8 +127,10 @@ void fecConfig(int fec_idx, o2::alf::roc::Parameters::CardIdType cardId1, o2::al
 
 int main(int argc, char** argv)
 {
-  o2::alf::roc::PciAddress pci_addr1(argv[1]);
-  o2::alf::roc::PciAddress pci_addr2(argv[2]);
+  std::string pci_addr_str1(argv[1]);
+  std::string pci_addr_str2(argv[2]);
+  o2::alf::roc::PciAddress pci_addr1(pci_addr_str1);
+  o2::alf::roc::PciAddress pci_addr2(pci_addr_str2);
   o2::alf::roc::Parameters::CardIdType cardId1 = pci_addr1;
   o2::alf::roc::Parameters::CardIdType cardId2 = pci_addr2;
   auto card1 = roc::findCard(cardId1);
@@ -159,8 +173,8 @@ int main(int argc, char** argv)
   for(int fec_idx = 0; fec_idx < 24; fec_idx++) {
     workers.push_back(std::thread(fecConfig,
         fec_idx,
-        cardId1,
-        cardId2,
+        pci_addr_str1,
+        pci_addr_str2,
         &(dsConfigVec[fec_idx])));
   }
   for(auto& t : workers) {
@@ -168,7 +182,7 @@ int main(int argc, char** argv)
   }
 #else
   for(int fec_idx = 0; fec_idx < 24; fec_idx++) {
-    fecConfig(fec_idx, cardId1, cardId2, &(dsConfigVec[fec_idx]));
+    fecConfig(fec_idx, pci_addr_str1, pci_addr_str2, &(dsConfigVec[fec_idx]));
     printf("Link %d configured\n",fec_idx);
     //getchar();
   }

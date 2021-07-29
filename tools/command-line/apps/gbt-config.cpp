@@ -1,5 +1,4 @@
-
-#// Copyright CERN and copyright holders of ALICE O2. This software is
+// Copyright CERN and copyright holders of ALICE O2. This software is
 // distributed under the terms of the GNU General Public License v3 (GPL
 // Version 3), copied verbatim in the file "COPYING".
 //
@@ -16,12 +15,73 @@
 
 #include <chrono>
 #include <thread>
+#include <mutex>
 #include <vector>
+
+//#define PARALLEL 1
 
 #include "Alf/Alf.h"
 #include "Alf/Lla.h"
 
 using namespace o2::alf;
+
+static bool success = {true};
+
+static std::mutex gCardIdMutex;
+
+
+void gbtConfig(int linkid, o2::alf::roc::Parameters::CardIdType cardId1, o2::alf::roc::Parameters::CardIdType cardId2, std::vector<std::pair<uint32_t, uint32_t>>* registers)
+{
+  if(registers->empty()) return;
+  gCardIdMutex.lock();
+  o2::alf::roc::Parameters::CardIdType cardId = (linkid < 12) ? cardId1 : cardId2;
+  auto linkid_ = linkid % 12;
+  //std::cout << "Creating GBT IC interface for card " << cardId << "/" << linkid_ << std::endl;
+  o2::alf::Ic ic(cardId, linkid_);
+  gCardIdMutex.unlock();
+  for(auto& reg : *registers) {
+    try {
+      //printf("Writing 0x%X into GBT register %d of link %d\n", reg.second, reg.first, linkid);
+      ic.write(reg.first, reg.second);
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    } catch (const IcException& e) {
+      std::cerr << e.what() << std::endl;
+      success = false;
+      gCardIdMutex.lock();
+      std::cout << "SOLAR " << cardId << "/" << linkid_ << " failed" << std::endl;
+      gCardIdMutex.unlock();
+      return;
+    }
+  }
+  gCardIdMutex.lock();
+  std::cout << "SOLAR " << cardId << "/" << linkid_ << " succesfully configured" << std::endl;
+  gCardIdMutex.unlock();
+}
+
+void readFile(std::string regfile, o2::alf::roc::Parameters::CardIdType& cardId1, o2::alf::roc::Parameters::CardIdType& cardId2)
+{
+  std::vector<std::pair<uint32_t, uint32_t>> registers[24];
+  FILE* f  = fopen(regfile.c_str(),"r");
+  //auto ic = Ic(card, linkid);
+  uint32_t linkid, reg=0, val;
+  while(fscanf(f,"%u %u %u", &linkid, &reg, &val) == 3) {
+    registers[linkid].push_back(std::make_pair(reg, val));
+  }
+
+#ifdef PARALLEL
+  std::vector<std::thread> workers;
+  for(int linkid = 0; linkid < 24; linkid++) {
+    workers.push_back(std::thread(gbtConfig, linkid, cardId1, cardId2, &(registers[linkid])));
+  }
+  for(auto& t : workers) {
+    t.join();
+  }
+#else
+  for(int linkid = 0; linkid < 24; linkid++) {
+    gbtConfig(linkid, cardId1, cardId2, &(registers[linkid]));
+  }
+#endif
+}
 
 
 int main(int argc, char** argv)
@@ -38,15 +98,17 @@ int main(int argc, char** argv)
 
   char command = argv[3][0];
 
-  int linkid = atoi(argv[4]);
-  
-  o2::alf::roc::Parameters::CardIdType cardId = (linkid >= 12) ? cardId1 : cardId2;
-  linkid = linkid % 12;
-  auto ic = o2::alf::Ic(cardId, linkid);
+  //int linkid = atoi(argv[4]);
 
   if(command == 'r') {
-    //int linkid = atoi(argv[3]);
+    int linkid = atoi(argv[4]);
     int reg = atoi(argv[5]);
+
+  o2::alf::roc::Parameters::CardIdType cardId = (linkid < 12) ? cardId1 : cardId2;
+  linkid = linkid % 12;
+
+  std::cout << "Creating GBT IC interface for card " << cardId << "/" << linkid << std::endl;
+  auto ic = o2::alf::Ic(cardId, linkid);
     //auto ic = Ic(card, linkid);
     try {
       uint32_t rval = ic.read(reg);
@@ -59,9 +121,15 @@ int main(int argc, char** argv)
   }
 
   if(command == 'w') {
-    //int linkid = atoi(argv[3]);
+    int linkid = atoi(argv[4]);
     int reg = atoi(argv[5]);
     uint32_t val = atoi(argv[6]);
+
+    o2::alf::roc::Parameters::CardIdType cardId = (linkid < 12) ? cardId1 : cardId2;
+    linkid = linkid % 12;
+
+    std::cout << "Creating GBT IC interface for card " << cardId << "/" << linkid << std::endl;
+    auto ic = o2::alf::Ic(cardId, linkid);
     //auto ic = Ic(card, linkid);
     printf("Writing 0x%X into GBT register %d\n", val, reg);
     try {
@@ -81,31 +149,17 @@ int main(int argc, char** argv)
   }
 
   if(command == 'f') {
-    //int linkid = atoi(argv[3]);
-    FILE* f  = fopen(argv[5],"r");
-    //auto ic = Ic(card, linkid);
-    uint32_t reg=0, val;
-    try {
-      while(fscanf(f,"%u %u", &reg, &val) == 2) {
-	//printf("Writing 0x%X into GBT register %d of link %d", val, reg, linkid);
-	ic.write(reg, val);
-	std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	//uint32_t rval = ic.read(reg);
-	//printf("  ->  0x%X\n", rval);
-	//if( val != rval ) {
-	//  printf("Failed writing 0x%X into GBT register %d of link %d  ->  0x%X\n", val, reg, linkid, rval);
-	//  return 1;
-	//}
-      }
-    } catch (const IcException& e) {
-      std::cerr << e.what() << std::endl;
-      llaSession->stop();
-      return 1;
-    }
+    readFile(argv[4], cardId1, cardId2);
   }
 
   if(command == 'd') {
-    //int linkid = atoi(argv[3]);
+    int linkid = atoi(argv[4]);
+
+    o2::alf::roc::Parameters::CardIdType cardId = (linkid < 12) ? cardId1 : cardId2;
+    linkid = linkid % 12;
+
+    std::cout << "Creating GBT IC interface for card " << cardId << "/" << linkid << std::endl;
+    auto ic = o2::alf::Ic(cardId, linkid);
     //auto ic = Ic(card, linkid);
     for(int reg = 0; reg <= 368; reg++) {
       try {
