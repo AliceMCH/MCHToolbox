@@ -61,16 +61,19 @@ set(LIB_SRCS
   src/Sca/sampa.cpp
   src/Sca/fec_revision.cpp
   src/Sca/ds_fec.cpp
+  src/decode/decode.cpp
 )
 
 set(EXE_SRCS
   gbt-config.cpp
   ds-config.cpp
+  cru-decode.cpp
 )
 
 set(EXE_NAMES
   gbt-config
   ds-config
+  cru-decode
 )
 
 list(LENGTH EXE_SRCS count)
