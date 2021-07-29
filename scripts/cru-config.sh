@@ -66,3 +66,4 @@ roc-pat-player --id=${CRU_PCI_ADDR} --idle=0x0C0300C0300C0300C030 \
     --sync=0x3C0F03C0F03C0F03C0F0 \
     --sync-length=1 --sync-delay=0 --sync-trigger-select=4
 
+echo ""; echo "Configuration of CRU $CRU completed."
