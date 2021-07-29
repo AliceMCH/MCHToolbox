@@ -30,3 +30,12 @@
 *.exe
 *.out
 *.app
+
+# EMACS backups
+*~
+
+# OSX sidecar files
+._*
+
+# cmake build folders
+tools/command-line/build
