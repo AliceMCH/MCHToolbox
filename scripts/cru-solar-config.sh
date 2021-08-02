@@ -11,10 +11,14 @@ fi
 
 source env-${CRU}.sh
 
-bash ./cru-check-link-status.sh $CRU
-if [ $? -ne 0 ]; then
-    exit 1
-fi
+while [ true ]; do
+    bash ./cru-check-link-status.sh $CRU
+    if [ $? -eq 0 ]; then
+	break
+    fi
+    echo -n "Some SOLAR boards are DOWN, please try to power-cycle the corresponding crates and press enter..."
+    read dummy
+done
 
 bash ./cru-get-ds-enabled.sh $CRU
 

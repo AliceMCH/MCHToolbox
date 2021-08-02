@@ -68,12 +68,14 @@ set(EXE_SRCS
   gbt-config.cpp
   ds-config.cpp
   cru-decode.cpp
+  cru-decode-ul.cpp
 )
 
 set(EXE_NAMES
   gbt-config
   ds-config
   cru-decode
+  cru-decode-ul
 )
 
 list(LENGTH EXE_SRCS count)

@@ -34,8 +34,8 @@ done
 
 
 if [ x"${CRU_UL_ENABLED}" = "x1" ]; then
-    echo "${SCRIPTDIR}/../tools/Decode/CRUdecode -c $CRU -d 0 -n $BOARDS $FILE"
-    ${SCRIPTDIR}/../tools/Decode/CRUdecode -c $CRU -d 0 -n $BOARDS "$FILE"
+    echo "${SCRIPTDIR}/../tools/command-line/build/cru-decode-ul -c $CRU -d 0 -n $BOARDS $FILE"
+    ${SCRIPTDIR}/../tools/command-line/build/cru-decode-ul -c $CRU -d 0 -n $BOARDS "$FILE"
 else
 #gdb -ex run 
     echo "${SCRIPTDIR}/../tools/command-line/build/cru-decode -c $1 -d 0 -n $BOARDS $FILE"
