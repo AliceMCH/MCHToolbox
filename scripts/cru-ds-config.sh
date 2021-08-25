@@ -28,7 +28,7 @@ RETRIES=${I2C_RETRIES}
 if [ x"$RUNTYPE" = "xpedestals" -o x"$RUNTYPE" = "xpedestals_ul" -o x"$RUNTYPE" = "xhb_check" -o x"$RUNTYPE" = "xber_check" ]; then
 
     echo "./gen-sampa-config-ped.sh $SAMPLES"
-    bash ./gen-sampa-config-ped.sh $SAMPLES
+    bash ./gen-sampa-config-ped.sh $CRU $SAMPLES
     PEDESTALS=1
 
 elif [ x"$RUNTYPE" = "xphysics_continuous_ul" ]; then
@@ -39,7 +39,7 @@ elif [ x"$RUNTYPE" = "xphysics_continuous_ul" ]; then
 elif [ x"$RUNTYPE" = "xphysics_continuous_ul_csum" ]; then
 
     echo "gen-sampa-config-continuous-csum.sh ${ADC_THR}"
-    bash gen-sampa-config-continuous-csum.sh ${ADC_THR}
+    bash gen-sampa-config-continuous-csum.sh ${CRU} ${ADC_THR}
 
 elif [ x"$RUNTYPE" = "xphysics_triggered" ] || \
         [ x"$RUNTYPE" = "xphysics_triggered_ul" ]; then
@@ -59,7 +59,7 @@ fi
 NENABLED=0
 NDISABLED=0
 CFGFILE=/tmp/ds-config-${CRU}.txt
-rm -f ds_config.txt
+rm -f $CFGFILE
 for CRU_LINK in $(seq 0 23); do
     for DS in $(seq 0 39); do
 	TEST=$(cat board-enable-${CRU}.txt | grep "${FEEID} ${CRU_LINK} ${DS} 1")
@@ -69,8 +69,8 @@ for CRU_LINK in $(seq 0 23); do
 	NENABLED=$((NENABLED+1))
 
 	if [ x"$PEDESTALS" != "x1" ]; then
-	    cp config_sampa_0.txt /tmp/config_sampa_${CRU_LINK}_${DS}_0.txt
-	    cp config_sampa_1.txt /tmp/config_sampa_${CRU_LINK}_${DS}_1.txt
+	    cp config_sampa_${CRU}_0.txt /tmp/config_sampa_${CRU_LINK}_${DS}_0.txt
+	    cp config_sampa_${CRU}_1.txt /tmp/config_sampa_${CRU_LINK}_${DS}_1.txt
 	    echo "${CRU_LINK} ${DS}  /tmp/config_sampa_${CRU_LINK}_${DS}_0.txt /tmp/config_sampa_${CRU_LINK}_${DS}_1.txt" >> $CFGFILE
 
 	    # mute noisy channels
@@ -98,7 +98,7 @@ for CRU_LINK in $(seq 0 23); do
 		done
 	    fi
 	else
-	    echo "${CRU_LINK} ${DS} config_sampa_0.txt config_sampa_1.txt" >> $CFGFILE
+	    echo "${CRU_LINK} ${DS} config_sampa_${CRU}_0.txt config_sampa_${CRU}_1.txt" >> $CFGFILE
 	fi
 
 	CRU_LINK2=$(echo "scale=0; ${CRU_LINK}%12" | bc -l)
@@ -114,7 +114,7 @@ for I in $(seq 1 1); do
     #echo "../alice-tpc-fec-utils/build/src/cru/tdsinit "${CRU_PCI_ADDR}" ds_config.txt"
     #time ../alice-tpc-fec-utils/build/src/cru/tdsinit "${CRU_PCI_ADDR}" ds_config.txt $RETRIES >& sampa_load.log
     echo "../tools/command-line/build/ds-init \"${CRU_PCI_ADDR1}\" \"${CRU_PCI_ADDR2}\" $CFGFILE $RETRIES"
-    time ../tools/command-line/build/ds-config "${CRU_PCI_ADDR1}" "${CRU_PCI_ADDR2}" $CFGFILE $RETRIES >& sampa_load.log
+    time ../tools/command-line/build/ds-config "${CRU_PCI_ADDR1}" "${CRU_PCI_ADDR2}" $CFGFILE $RETRIES >& sampa_load_${CRU}.log
     RET=$?
     if [ x"$RET" = "x0" ]; then
         echo "$NENABLED sampa boards configured"
@@ -123,7 +123,7 @@ for I in $(seq 1 1); do
 	#exit 0
 	echo "SAMPA configuration failed, retrying ($I)"; sleep 1
 	#cat sampa_load.log | grep "ERROR" | grep "Configuration" | grep "failed"
-        cat sampa_load.log | grep "failed"
+        cat sampa_load_${CRU}.log | grep "failed"
     fi
 done
 

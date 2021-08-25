@@ -18,6 +18,7 @@ fi
 
 
 if [ x"$RUNTYPE" = "xpedestals" ]; then
+    echo "roc-pat-player --id=${CRU_PCI_ADDR} --idle=${PATT_IDLE} --sync=${PATT_PHYS} --reset=${PATT_SYNC} --sync-length=1 --sync-delay=0 --sync-trigger-select=4 --reset-trigger-select=12"
     roc-pat-player --id=${CRU_PCI_ADDR} --idle=${PATT_IDLE} \
 	--sync=${PATT_PHYS} \
         --reset=${PATT_SYNC} \
@@ -26,6 +27,7 @@ if [ x"$RUNTYPE" = "xpedestals" ]; then
 fi
 
 if [ x"$RUNTYPE" = "xpedestals_ul" ]; then
+    echo "roc-pat-player --id=${CRU_PCI_ADDR} --idle=${PATT_IDLE} --sync=${PATT_PHYS} --reset=${PATT_SYNC} --sync-length=1 --sync-delay=0 --sync-trigger-select=11 --reset-trigger-select=12"
     roc-pat-player --id=${CRU_PCI_ADDR} --idle=${PATT_IDLE} \
 	--sync=${PATT_PHYS} \
         --reset=${PATT_SYNC} \

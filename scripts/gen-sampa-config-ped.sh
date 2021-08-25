@@ -1,14 +1,15 @@
 #! /bin/bash
 
 #SAMPLES=2
-SAMPLES=$1
+CRU=$1
+SAMPLES=$2
 
 SAMPLESX=$(echo "obase=16; $((SAMPLES-1))" | bc)
 
 P1=0x${SAMPLESX}
 P2=0x00
 
-export CONFIGFILE="config_sampa_0.txt"
+export CONFIGFILE="config_sampa_${CRU}_0.txt"
 rm -f "${CONFIGFILE}"
 
 echo "-1 0x0e 0x05" >> "${CONFIGFILE}"
@@ -26,7 +27,7 @@ echo "-1 0x26 0xff" >> "${CONFIGFILE}"
 echo "-1 0x27 0xff" >> "${CONFIGFILE}"
 echo "-1 0x0e 0x05" >> "${CONFIGFILE}"
 
-export CONFIGFILE="config_sampa_1.txt"
+export CONFIGFILE="config_sampa_${CRU}_1.txt"
 rm -f "${CONFIGFILE}"
 
 echo "-1 0x0e 0x05" >> "${CONFIGFILE}"
