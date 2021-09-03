@@ -1,10 +1,11 @@
 #! /bin/bash
 
-THR=$1
+CRU=$1
+THR=$2
 
 for SID in "0" "1"; do
 
-CONFIGFILE="config_sampa_${SID}.txt"
+CONFIGFILE="config_sampa_${CRU}_${SID}.txt"
 rm -f "${CONFIGFILE}"
 
 #software reset at the beginning

@@ -27,31 +27,31 @@ RETRIES=${I2C_RETRIES}
 
 if [ x"$RUNTYPE" = "xpedestals" -o x"$RUNTYPE" = "xpedestals_ul" -o x"$RUNTYPE" = "xhb_check" -o x"$RUNTYPE" = "xber_check" ]; then
 
-    echo "./gen-sampa-config-ped.sh $SAMPLES"
+    echo "./gen-sampa-config-ped.sh $CRU $SAMPLES"
     bash ./gen-sampa-config-ped.sh $CRU $SAMPLES
     PEDESTALS=1
 
 elif [ x"$RUNTYPE" = "xphysics_continuous_ul" ]; then
 
-    echo "gen-sampa-config-continuous.sh ${ADC_THR}"
-    bash gen-sampa-config-continuous.sh ${ADC_THR}
+    echo "gen-sampa-config-continuous.sh ${CRU} ${ADC_THR}"
+    bash gen-sampa-config-continuous.sh ${CRU} ${ADC_THR}
 
 elif [ x"$RUNTYPE" = "xphysics_continuous_ul_csum" ]; then
 
-    echo "gen-sampa-config-continuous-csum.sh ${ADC_THR}"
+    echo "gen-sampa-config-continuous-csum.sh $CRU ${ADC_THR}"
     bash gen-sampa-config-continuous-csum.sh ${CRU} ${ADC_THR}
 
 elif [ x"$RUNTYPE" = "xphysics_triggered" ] || \
         [ x"$RUNTYPE" = "xphysics_triggered_ul" ]; then
 
-    echo "gen-sampa-config-triggered.sh" ${ADC_THR}
-    bash gen-sampa-config-triggered.sh ${ADC_THR}
+    echo "gen-sampa-config-triggered.sh" ${CRU} ${ADC_THR}
+    bash gen-sampa-config-triggered.sh ${CRU} ${ADC_THR}
 
 elif [ x"$RUNTYPE" = "xphysics_triggered_csum" ] || \
         [ x"$RUNTYPE" = "xphysics_triggered_ul_csum" ]; then
 
-    echo "gen-sampa-config-triggered-csum.sh ${ADC_THR}"
-    bash gen-sampa-config-triggered-csum.sh ${ADC_THR}
+    echo "gen-sampa-config-triggered-csum.sh ${CRU} ${ADC_THR}"
+    bash gen-sampa-config-triggered-csum.sh ${CRU} ${ADC_THR}
 
 fi
 
