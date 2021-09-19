@@ -33,6 +33,8 @@ static bool success = {true};
 
 static std::mutex gCardIdMutex;
 
+static int sRetries = 2;
+
 struct DsConfig
 {
   DsConfig(int id, std::string c0, std::string c1): dsId(id), cf0(c0), cf1(c1) { }
@@ -87,7 +89,7 @@ void fecConfig(int fec_idx, std::string pci_addr_str1, std::string pci_addr_str2
     //continue;
 
     bool readback = true;
-    int retries = 3; //10;
+    int retries = sRetries; //10;
 
     for(auto cfg : *dsConfigVec) {
 
@@ -99,14 +101,14 @@ void fecConfig(int fec_idx, std::string pci_addr_str1, std::string pci_addr_str2
         //std::cout << "Loading SAMPA registers" << std::endl;
         if( !fec.sampaConfigure(cf0, ds_idx*2, retries, readback, &std::cout) ) {
           std::cout << "ERROR: Configuration of SAMPA chip " << fec_idx << ":" << ds_idx*2
-              << " (LINK " << fec_idx << " J" << ds_idx/5 + 1 << " DS" << (ds_idx%5) << ") failed" << std::endl << std::endl;
+		    << " (LINK " << fec_idx << " S" << (fec_idx%6) + 1 << " J" << ds_idx/5 + 1 << " DS" << (ds_idx%5) << ") failed" << std::endl << std::endl;
           success = false;
           break;
         }
         //std::cout<<"SAMPA "<< fec_idx << ":" << ds_idx*2<<" succesfully configured\n";
         if( !fec.sampaConfigure(cf1, ds_idx*2+1, retries, readback, &std::cout) ) {
           std::cout << "ERROR: Configuration of SAMPA chip " << fec_idx << ":" << ds_idx*2+1
-              << " (LINK " << fec_idx << " J" << ds_idx/5 + 1 << " DS" << (ds_idx%5) << ") failed" << std::endl << std::endl;
+		    << " (LINK " << fec_idx << " S" << (fec_idx%6) + 1 << " J" << ds_idx/5 + 1 << " DS" << (ds_idx%5) << ") failed" << std::endl << std::endl;
           success = false;
           break;
         }
@@ -167,6 +169,8 @@ int main(int argc, char** argv)
 
     dsConfigVec[fec_idx].emplace_back(ds_idx, cf0, cf1);
   }
+
+  sRetries = atoi(argv[4]);
 
 #ifdef PARALLEL
   std::vector<std::thread> workers;
