@@ -30,6 +30,8 @@ REGFILE=gbtx-regs-${CRU}.txt
 
 
 if [ ! -e $REGFILE -o $REGFILE -ot board-enable-${CRU}.txt ]; then
+    
+    rm -f "$REGFILE"
 
     result=0
     NLINKS=$(echo "${CRU_LINKS1}" | tr "," "\n" | wc -l)
@@ -68,5 +70,7 @@ if [ x"$WAIT" = "x1" ]; then
     echo "Programming finished..."
     read dummy
 fi
+
+echo "Configuration of SOLAR boards for CRU $CRU completed."
 
 exit $result
