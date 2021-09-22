@@ -80,6 +80,20 @@ or
 ```
 The commands will stop as soon as an error is encountered.
 
+# Trigger configuration
+
+The patplayer can be configured according to the chosen run type with the following scripts:
+```
+./cru-config-trigger.sh CRUID
+```
+or
+```
+./flp-config-trigger.sh CRUID
+```
+to configure all the CRUs in the FLP at once.
+
+This script are currently needed also when setting-up the CRUs for taking data with AliECS.
+
 # Data taking
 
 Data from a single CRU can be collected for both clock sources. The data taking is handled via the following script:
