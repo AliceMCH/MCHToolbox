@@ -23,7 +23,7 @@ while read LINE; do
 	    if [ -z "$LINKID" ]; then continue; fi
 
 	    CRATEID=$(echo "scale=0; $LINKID / 8" | bc)
-	    SOLARID=$(echo "scale=0; $LINKID % 8" | bc)
+	    SOLARID=$(echo "scale=0; $LINKID % 8 + 1" | bc)
 
 	    echo "SOLARLINK ID: $LINKID    CRATE ID: $CRATEID   SOLAR ID: $SOLARID"
 	    cat fec.map | grep -e "^$LINKID"
