@@ -64,7 +64,7 @@ void fecConfig(int fec_idx, std::string pci_addr_str1, std::string pci_addr_str2
 #else
     std::unique_ptr<common::Bar> bar;
     try {
-      bar.reset(common::BarFactory::makeBar(argv[1], 2));
+      bar.reset(common::BarFactory::makeBar(pci_addr_str1, 2));
     } catch (std::exception& e) {
       std::cerr << e.what() << std::endl;
       exit(1);

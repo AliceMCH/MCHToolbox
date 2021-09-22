@@ -7,7 +7,7 @@
 
 #include "hdlc_core.hpp"
 
-#include "Alf/Alf.h"
+#include "../../ALF/include/Alf/Alf.h"
 
 using namespace o2::alf;
 

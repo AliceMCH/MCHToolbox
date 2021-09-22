@@ -46,7 +46,8 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 find_package(Common REQUIRED)
 find_package(InfoLogger REQUIRED)
 find_package(ReadoutCard REQUIRED)
-find_package(ALF REQUIRED)
+find_package(LLA REQUIRED)
+#find_package(ALF REQUIRED)
 
 
 ####################################
@@ -54,6 +55,10 @@ find_package(ALF REQUIRED)
 ####################################
 
 set(LIB_SRCS
+  ALF/src/ScBase.cxx
+  ALF/src/Ic.cxx
+  ALF/src/Sca.cxx
+  ALF/src/Lla.cxx
   src/Sca/hdlc_core.cpp
   src/Sca/hdlc_alf.cpp
   src/Sca/cern/hdlc_cern_me.cpp
@@ -98,7 +103,8 @@ foreach(i RANGE ${count})
       AliceO2::Common
       AliceO2::InfoLogger
       AliceO2::ReadoutCard
-      o2::ALF
+      o2::LLA
+      #o2::ALF
   )
   # Use C++17
   target_compile_features(${name} PUBLIC cxx_std_17)
