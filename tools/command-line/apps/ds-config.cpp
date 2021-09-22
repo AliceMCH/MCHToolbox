@@ -19,7 +19,7 @@
 #include <vector>
 
 #define BUILD_FOR_CRU 1
-#define BUILD_FOR_ALF 1
+//#define BUILD_FOR_ALF 1
 //#define PARALLEL 1
 
 #include "../src/Sca/cern/hdlc_cern_me.hpp"
