@@ -46,12 +46,13 @@ void gbtConfig(int linkid, o2::alf::roc::Parameters::CardIdType cardId1, o2::alf
 	//printf("Writing 0x%X into GBT register %d of link %d\n", reg.second, reg.first, linkid);
 	ic.write(reg.first, reg.second);
 	std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	auto rval = ic.read(reg.first);
-	if(rval != reg.second) {
-	  printf("ERROR writing reg %d: %X != %X\n", reg.first, rval, reg.second);
-	  continue;
-	}
-	std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	// GBT register readback seems to induce IC WRITE errors in some cases, so it is disabled
+        //auto rval = ic.read(reg.first);
+	//if(rval != reg.second) {
+	//  printf("ERROR writing reg %d: %X != %X\n", reg.first, rval, reg.second);
+	//  continue;
+	//}
+	//std::this_thread::sleep_for(std::chrono::milliseconds(10));
       } catch (const IcException& e) {
 	std::cerr << e.what() << std::endl;
 	success = false;
