@@ -23,6 +23,7 @@ RUNTYPE=pedestals
 export ADC_THR=0C
 export NOISE_THR=2.0
 
+
 #export ADC_THR=10
 #export NOISE_THR=100
 
@@ -31,6 +32,8 @@ export NOISE_THR=2.0
 
 #export ADC_THR=FF
 
+
+export TF_LENGTH=128
 
 CRU_UL_ENABLED=0
 if [ x"${RUNTYPE}" = "xpedestals_ul" ] ||              \
@@ -187,6 +190,7 @@ echo "export CRU_UL_ENABLED=${CRU_UL_ENABLED}" >> ${ENVFILE}
 echo "export CRU_CSUM_ENABLED=${CRU_CSUM_ENABLED}" >> ${ENVFILE}
 echo "export FEEID=${FEEID}" >> ${ENVFILE}
 echo "export ONUID=${ONUID}" >> ${ENVFILE}
+echo "export TF_LENGTH=${TF_LENGTH}" >> ${ENVFILE}
 echo "export CRU_LINKS1_1=${CRU_LINKS1_1}" >> ${ENVFILE}
 echo "export CRU_LINKS1_2=${CRU_LINKS1_2}" >> ${ENVFILE}
 echo "export CRU_LINKS1=${CRU_LINKS1}" >> ${ENVFILE}

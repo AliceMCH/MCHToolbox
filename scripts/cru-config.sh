@@ -29,7 +29,7 @@ WINX=$(echo "obase=16; $WIN" | bc)
 
 
 ONUID=$CRU
-RC_OPT="${FORCE_CONFIG} --bypass-fw-check --clock=${CRU_CLKSRC} --datapathmode=STREAMING --gbtmux=ttc --downstreamdata=pattern --cru-id=${CRUIDX} --dyn --trigger-window-size $WIN --pon --onu=${ONUID} --system-id=A --allow-rejection "
+RC_OPT="${FORCE_CONFIG} --bypass-fw-check --clock=${CRU_CLKSRC} --datapathmode=STREAMING --gbtmux=ttc --downstreamdata=pattern --cru-id=${CRUIDX} --dyn --trigger-window-size $WIN --pon --onu=${ONUID} --system-id=A --allow-rejection --tf-length ${TF_LENGTH}"
 
 if [ x"${CRU_UL_ENABLED}" = "x1" ]; then
     RC_OPT="${RC_OPT} --user-logic"
