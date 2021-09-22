@@ -5,6 +5,8 @@ if [ x"$1" = "x-f" ]; then FORCE_CONFIG="--force-config"; shift; fi
 
 CRU=$1
 
+if [ cru.map -nt env-${CRU}.sh ]; then ./cru-init-env.sh $CRU; fi
+
 source env-${CRU}.sh
 
 CRUID=$CRU
