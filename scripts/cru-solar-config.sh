@@ -16,7 +16,10 @@ while [ true ]; do
     if [ $? -eq 0 ]; then
 	break
     fi
-    echo -n "Some SOLAR boards are DOWN, please try to power-cycle the corresponding crates and press enter..."
+    echo ""; echo "";
+    RED='\033[0;31m'
+    NC='\033[0m' # No Color
+    echo -n -e "${RED}Some SOLAR boards are DOWN, please try to power-cycle the corresponding crates and press enter...${NC}"
     read dummy
 done
 
