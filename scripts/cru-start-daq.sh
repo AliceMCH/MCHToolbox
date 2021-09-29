@@ -1,5 +1,11 @@
 #! /bin/bash
 
+CHECK=0
+if [ "$1" = "-c" ]; then
+    CHECK=1
+    shift
+fi
+
 CRU=$1
 FILE="$2"
 if [ x"$FILE" = "x" ]; then
@@ -50,4 +56,8 @@ done
 
 if [ x"${CRU_CLKSRC}" = "xlocal" ]; then
     roc-ctp-emulator --id=${CRU_PCI_ADDR} --eox
+fi
+
+if [ x"$CHECK" = "x1" ]; then
+    ./cru-check-data.sh $CRU
 fi
