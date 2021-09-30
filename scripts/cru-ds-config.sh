@@ -14,9 +14,6 @@ if [ x"${RUNTYPE}" = "xpedestals_ul" ]; then
 fi
 
 
-
-
-
 bash ./cru-send-hard-reset.sh $CRU
 
 #bash ./gen_sampa_config_reset.sh
@@ -117,13 +114,14 @@ for I in $(seq 1 1); do
     time ../tools/command-line/build/ds-config "${CRU_PCI_ADDR1}" "${CRU_PCI_ADDR2}" $CFGFILE $RETRIES >& sampa_load_${CRU}.log
     RET=$?
     if [ x"$RET" = "x0" ]; then
-        echo "$NENABLED sampa boards configured"
+	echo ""; echo "Configuration of $NENABLED sampa boards finished"
 	exit 0
     else
 	#exit 0
 	echo "SAMPA configuration failed, retrying ($I)"; sleep 1
 	#cat sampa_load.log | grep "ERROR" | grep "Configuration" | grep "failed"
         cat sampa_load_${CRU}.log | grep "failed"
+	echo ""; echo "Configuration of $NENABLED sampa boards finished with errors"
     fi
 done
 
