@@ -105,6 +105,7 @@ echo "$NDISABLED channels disabled"
 
 
 #(cd ../alice-tpc-fec-utils-mt/build && make -j 8) || exit 1
+ERROR=0
 for I in $(seq 1 1); do
     #echo "../alice-tpc-fec-utils-mt/build/src/cru/tdsinit "${CRU_PCI_ADDR}" ds_config.txt"
     #time ../alice-tpc-fec-utils-mt/build/src/cru/tdsinit "${CRU_PCI_ADDR}" ds_config.txt >& sampa_load.log
@@ -115,15 +116,18 @@ for I in $(seq 1 1); do
     RET=$?
     if [ x"$RET" = "x0" ]; then
 	echo ""; echo "Configuration of $NENABLED sampa boards finished"
-	exit 0
     else
 	#exit 0
 	echo "SAMPA configuration failed, retrying ($I)"; sleep 1
 	#cat sampa_load.log | grep "ERROR" | grep "Configuration" | grep "failed"
         cat sampa_load_${CRU}.log | grep "failed"
 	echo ""; echo "Configuration of $NENABLED sampa boards finished with errors"
+	ERROR=1
     fi
 done
 
+
+./cru-config-trigger.sh $CRU
+
  
-exit 1
+exit $ERROR

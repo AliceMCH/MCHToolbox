@@ -9,6 +9,12 @@ source ${SCRIPTDIR}/env-${CRU}.sh
 
 RESULT=0
 for DW in 0 1; do
+    if [ $DW -eq 0 -a x"${CRU_LINKS1_1}" = "x" ]; then
+	continue;
+    fi
+    if [ $DW -eq 1 -a x"${CRU_LINKS1_2}" = "x" ]; then
+	continue;
+    fi
     TEST=$(./cru-link-status.sh $CRU $DW)
     echo -n "CRU $1:$DW link status: "
     OK=1
