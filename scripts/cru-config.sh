@@ -37,19 +37,23 @@ if [ x"${CRU_UL_ENABLED}" = "x1" ]; then
     RC_OPT="${RC_OPT} --user-logic"
 fi
 
-RC_OPT2="--id=${CRU_SN}:0 --links=${CRU_LINKS2_1}"
+if [ x"${CRU_LINKS2_1}" != "x" ]; then
+    RC_OPT2="--id=${CRU_SN}:0 --links=${CRU_LINKS2_1}"
+else
+    RC_OPT2="--id=${CRU_SN}:0 --no-gbt"
+fi
 #RC_OPT2="--id=${CRU_PCI_ADDR} --links=${CRU_LINKS2_1}"
 echo "roc-config $RC_OPT $RC_OPT2"
-if [ -n "${CRU_LINKS2_1}" ]; then
-    roc-config $RC_OPT $RC_OPT2
-fi
+roc-config $RC_OPT $RC_OPT2
 
-RC_OPT2="--id=${CRU_SN}:1 --links=${CRU_LINKS2_2}"
+if [ x"${CRU_LINKS2_2}" != "x" ]; then
+    RC_OPT2="--id=${CRU_SN}:1 --links=${CRU_LINKS2_2}"
+else
+    RC_OPT2="--id=${CRU_SN}:1 --no-gbt"
+fi
 #RC_OPT2="--id=${CRU_PCI_ADDR2} --links=${CRU_LINKS2_2}"
 echo "roc-config $RC_OPT $RC_OPT2"
-if [ -n "${CRU_LINKS2_2}" ]; then
-    roc-config $RC_OPT $RC_OPT2
-fi
+roc-config $RC_OPT $RC_OPT2
 
 
 
