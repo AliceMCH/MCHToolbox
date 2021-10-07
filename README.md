@@ -28,10 +28,11 @@ The CRU parameters that control the front-end configuration and data taking
 are defined in the `cru-init-env.sh` script.
 The most important parameters that can be set are the following:
 
-* `RUNTYPE`: defines the type of data taking configuration. The SAMPA and trigger configurations are set accordingly.
 * `CRU_CLKSRC`: can be `local` (clock is generated internally) or `ttc` (clock comes from the LTU). In the latter case the data taking can only be controlled via the LTU GUI.
 * `NSAMPLES`: number of ADC samples per event in pedestal mode (`RUNTYPE=pedestals`)
 * `NSAMPLES_UL`: number of ADC samples per event in pedestal mode (`RUNTYPE=pedestals_ul`)
+
+The type of data taking configuration must be set using the `./set-run-type.sh` script before invoking `./cru-init-env.sh`.
 
 Each time some parameter is changed, the environment of each CRU needs to be updated:
 ```
