@@ -32,7 +32,7 @@ The most important parameters that can be set are the following:
 * `NSAMPLES`: number of ADC samples per event in pedestal mode (`RUNTYPE=pedestals`)
 * `NSAMPLES_UL`: number of ADC samples per event in pedestal mode (`RUNTYPE=pedestals_ul`)
 
-The type of data taking configuration must be set using the `./set-run-type.sh` script before invoking `./cru-init-env.sh`.
+The data taking configuration must be set using the `./set-run-type.sh` script before invoking `./cru-init-env.sh`.
 
 Each time some parameter is changed, the environment of each CRU needs to be updated:
 ```
