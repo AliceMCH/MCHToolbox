@@ -1,5 +1,27 @@
 # Muon Tracking commissioning scripts
 
+## Run Type configuration
+
+The type of data taking configuration can be configured with the following command:
+```
+./set-run-type.sh [0-9]
+```
+where the numerical parameter is an integer from 0 to 9, with the following meanings:
+```
+0: pedestals
+1: pedestals_ul
+2: physics_triggered
+3: physics_triggered_csum
+4: physics_triggered_ul
+5: physics_triggered_ul_csum
+6: physics_continuous_ul
+7: physics_continuous_ul_csum
+8: hb_check
+9: ber_check
+```
+
+Each time the run type is changed the CRUs need to be re-configured (see next section).
+
 ## CRU configuration
 
 The CRU parameters that control the front-end configuration and data taking
