@@ -2,6 +2,9 @@
 
 CRU=$1
 
+source runtype.sh
+
+echo "RUNTYPE: $RUNTYPE"
 
 export I2C_RETRIES=2
 
@@ -9,7 +12,7 @@ export I2C_RETRIES=2
 CRU_CLKSRC=ttc
 
 #RUNTYPE=ber_check
-RUNTYPE=pedestals
+#RUNTYPE=pedestals
 #RUNTYPE=pedestals_ul
 #RUNTYPE=physics_triggered
 #RUNTYPE=physics_triggered_csum
