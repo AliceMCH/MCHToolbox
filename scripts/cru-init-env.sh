@@ -11,17 +11,6 @@ export I2C_RETRIES=2
 #CRU_CLKSRC=local
 CRU_CLKSRC=ttc
 
-#RUNTYPE=ber_check
-#RUNTYPE=pedestals
-#RUNTYPE=pedestals_ul
-#RUNTYPE=physics_triggered
-#RUNTYPE=physics_triggered_csum
-#RUNTYPE=physics_triggered_ul
-#RUNTYPE=physics_triggered_ul_csum
-#RUNTYPE=physics_continuous_ul
-#RUNTYPE=physics_continuous_ul_csum
-#RUNTYPE=hb_check
-
 
 export ADC_THR=0C
 export NOISE_THR=2.0

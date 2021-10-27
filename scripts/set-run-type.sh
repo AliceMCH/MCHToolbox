@@ -32,4 +32,5 @@ case $TYPE in
     9) RUNTYPE=ber_check;;
 esac
 
+echo "RUNTYPE=$RUNTYPE"
 echo "RUNTYPE=$RUNTYPE" > runtype.sh

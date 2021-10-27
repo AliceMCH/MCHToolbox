@@ -27,7 +27,7 @@ if [ -n "${CRU_PCI_ADDR1}" ]; then
 fi
 
 ROC2_EN=0
-if [ -n "${CRU_PCI_ADDR2}" ]; then
+if [ -n "${CRU_PCI_ADDR2}" -a "${CRU_PCI_ADDR2}" != "${CRU_PCI_ADDR1}" ]; then
     ROC2_EN=1
 fi
 
