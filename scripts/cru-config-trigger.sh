@@ -27,10 +27,13 @@ if [ x"$RUNTYPE" = "xpedestals" ]; then
 fi
 
 if [ x"$RUNTYPE" = "xpedestals_ul" ]; then
-    echo "roc-pat-player --id=${CRU_PCI_ADDR} --idle=${PATT_IDLE} --sync=${PATT_PHYS} --reset=${PATT_SYNC} --sync-length=1 --sync-delay=0 --sync-trigger-select=11 --reset-trigger-select=12"
-    roc-pat-player --id=${CRU_PCI_ADDR} --idle=${PATT_IDLE} \
-	--sync=${PATT_PHYS} \
-        --reset=${PATT_SYNC} \
+    PATT1=${PATT_IDLE}
+    PATT2=${PATT_PHYS}
+    PATT3=${PATT_SYNC}
+    echo "roc-pat-player --id=${CRU_PCI_ADDR} --idle=${PATT1} --sync=${PATT2} --reset=${PATT3} --sync-length=1 --sync-delay=0 --sync-trigger-select=11 --reset-trigger-select=12"
+    roc-pat-player --id=${CRU_PCI_ADDR} --idle=${PATT1} \
+	--sync=${PATT2} \
+        --reset=${PATT3} \
 	--sync-length=1 --sync-delay=0 --sync-trigger-select=11 --reset-trigger-select=12
     exit
 fi
@@ -59,7 +62,7 @@ fi
 echo "SEND_HBT: ${SEND_HBT}"
 
 CONTINUOUS=0
-if [ x"$RUNTYPE" = "xphysics_continuous_ul" -o x"$RUNTYPE" = "xphysics_continuous_ul_csum" ]; then
+if [ x"$RUNTYPE" = "xphysics_continuous_ul" -o x"$RUNTYPE" = "xphysics_continuous_ul_csum" -o x"$RUNTYPE" = "xphysics_continuous" -o x"$RUNTYPE" = "xphysics_continuous_csum" ]; then
     CONTINUOUS=1
 fi
 

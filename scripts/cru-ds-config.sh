@@ -28,12 +28,12 @@ if [ x"$RUNTYPE" = "xpedestals" -o x"$RUNTYPE" = "xpedestals_ul" -o x"$RUNTYPE" 
     bash ./gen-sampa-config-ped.sh $CRU $SAMPLES
     PEDESTALS=1
 
-elif [ x"$RUNTYPE" = "xphysics_continuous_ul" ]; then
+elif [ x"$RUNTYPE" = "xphysics_continuous_ul" -o x"$RUNTYPE" = "xphysics_continuous" ]; then
 
     echo "gen-sampa-config-continuous.sh ${CRU} ${ADC_THR}"
     bash gen-sampa-config-continuous.sh ${CRU} ${ADC_THR}
 
-elif [ x"$RUNTYPE" = "xphysics_continuous_ul_csum" ]; then
+elif [ x"$RUNTYPE" = "xphysics_continuous_ul_csum" -o x"$RUNTYPE" = "xphysics_continuous_csum" ]; then
 
     echo "gen-sampa-config-continuous-csum.sh $CRU ${ADC_THR}"
     bash gen-sampa-config-continuous-csum.sh ${CRU} ${ADC_THR}

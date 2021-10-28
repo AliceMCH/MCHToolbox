@@ -11,6 +11,14 @@ echo -n "Press Enter key to start the CTP emulator..."
 read dummy
 
 TRIGMODE=periodic
+#TRIGMODE=manual
+if [ x"${RUNTYPE}" = "xphysics_continuous" -o \
+     x"${RUNTYPE}" = "xphysics_continuous_ul" -o \
+     x"${RUNTYPE}" = "xphysics_continuous_csum" -o \
+     x"${RUNTYPE}" = "xphysics_continuous_ul_csum" ]; then
+    TRIGMODE=continuous
+fi
+
 #TRIGMODE=continuous
 
 TRIGRATE=4000000
