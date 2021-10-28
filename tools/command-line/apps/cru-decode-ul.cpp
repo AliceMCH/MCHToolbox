@@ -803,7 +803,14 @@ int main(int argc, char** argv)
         //printf("link_id: %d\n", link_id);
         //printf("ds_id: %d\n", ds_id);
 	//if(link_id != 0 || (ds_id != 0)) continue;
-	//if(link_id != 0) continue;
+	if(link_id == 15) {
+	  if( gPrintLevel >= 1) {
+	    printf("status word: %016lX\n", value);
+	    printf("14 bits: %016lX\n", (value >> 50)&0x3FFF);
+	  }
+	  continue;
+	}
+	if(link_id > 11) continue;
 
 	ds[cru_id][link_id][ds_id].lid = link_id;
 
@@ -976,6 +983,20 @@ int main(int argc, char** argv)
   }
 
   if(fnoiseout) fclose(fnoiseout);
+
+  for(unsigned int i = 0; i < board_vec.size(); i++) {
+    int l = board_vec[i] / 40;
+    int b = board_vec[i] % 40;
+    for(int j = 0; j < 2; j++) {
+      for(int k = 0; k < 32; k++) {
+	DualSampa& dsr = ds[0][l][b];
+        if( dsr.ndata[j][k] == 0 ) {
+          printf("L%d B%d J%d DS%d: missing data from chip %d channel %d\n", l, board_vec[i], ((b/5)+1), (b%5), j, k);
+          break;
+        }
+      }
+    }
+  }
 
   for(unsigned int i = 0; i < board_vec.size(); i++) {
     int l = board_vec[i] / 40;
