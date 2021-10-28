@@ -803,14 +803,15 @@ int main(int argc, char** argv)
         //printf("link_id: %d\n", link_id);
         //printf("ds_id: %d\n", ds_id);
 	//if(link_id != 0 || (ds_id != 0)) continue;
-	if(link_id == 15) {
+
+	if(word.linkID == 15) {
 	  if( gPrintLevel >= 1) {
 	    printf("status word: %016lX\n", value);
 	    printf("14 bits: %016lX\n", (value >> 50)&0x3FFF);
 	  }
 	  continue;
 	}
-	if(link_id > 11) continue;
+	if(word.linkID > 11) continue;
 
 	ds[cru_id][link_id][ds_id].lid = link_id;
 
