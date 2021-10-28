@@ -14,8 +14,10 @@ if [ x"$TYPE" = "x" ]; then
     echo "5: physics_triggered_ul_csum"
     echo "6: physics_continuous_ul"
     echo "7: physics_continuous_ul_csum"
-    echo "8: hb_check"
-    echo "9: ber_check"
+    echo "8: physics_continuous"
+    echo "9: physics_continuous_csum"
+    echo "10: hb_check"
+    echo "11: ber_check"
     exit 1
 fi
 
@@ -28,8 +30,10 @@ case $TYPE in
     5) RUNTYPE=physics_triggered_ul_csum;;
     6) RUNTYPE=physics_continuous_ul;;
     7) RUNTYPE=physics_continuous_ul_csum;;
-    8) RUNTYPE=hb_check;;
-    9) RUNTYPE=ber_check;;
+    8) RUNTYPE=physics_continuous;;
+    9) RUNTYPE=physics_continuous_csum;;
+    10) RUNTYPE=hb_check;;
+    11) RUNTYPE=ber_check;;
 esac
 
 echo "RUNTYPE=$RUNTYPE"
