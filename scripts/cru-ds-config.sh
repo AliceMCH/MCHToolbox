@@ -61,7 +61,7 @@ for CRU_LINK in $(seq 0 23); do
     for DS in $(seq 0 39); do
 	TEST=$(cat board-enable-${CRU}.txt | grep "${FEEID} ${CRU_LINK} ${DS} 1")
 	if [ -z "$TEST" ]; then continue; fi
-    
+
 	#echo "${FEEID} ${CRU_LINK} ${DS} enabled"
 	NENABLED=$((NENABLED+1))
 
@@ -120,7 +120,7 @@ for I in $(seq 1 1); do
 	#exit 0
 	echo "SAMPA configuration failed, retrying ($I)"; sleep 1
 	#cat sampa_load.log | grep "ERROR" | grep "Configuration" | grep "failed"
-        cat sampa_load_${CRU}.log | grep "failed"
+        cat sampa_load_${CRU}.log | grep "FAILED"
 	echo ""; echo "Configuration of $NENABLED sampa boards finished with errors"
 	ERROR=1
     fi

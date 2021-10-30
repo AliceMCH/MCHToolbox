@@ -101,14 +101,14 @@ void fecConfig(int fec_idx, std::string pci_addr_str1, std::string pci_addr_str2
         //std::cout << "Loading SAMPA registers" << std::endl;
         if( !fec.sampaConfigure(cf0, ds_idx*2, retries, readback, &std::cout) ) {
           std::cout << "ERROR: Configuration of SAMPA chip " << fec_idx << ":" << ds_idx*2
-		    << " (LINK " << fec_idx << " S" << (fec_idx%6) + 1 << " J" << ds_idx/5 + 1 << " DS" << (ds_idx%5) << ") failed" << std::endl << std::endl;
+		    << " (LINK " << fec_idx << " S" << (fec_idx%6) + 1 << " J" << ds_idx/5 + 1 << " DS" << (ds_idx%5) << ") FAILED" << std::endl << std::endl;
           success = false;
           break;
         }
         //std::cout<<"SAMPA "<< fec_idx << ":" << ds_idx*2<<" succesfully configured\n";
         if( !fec.sampaConfigure(cf1, ds_idx*2+1, retries, readback, &std::cout) ) {
           std::cout << "ERROR: Configuration of SAMPA chip " << fec_idx << ":" << ds_idx*2+1
-		    << " (LINK " << fec_idx << " S" << (fec_idx%6) + 1 << " J" << ds_idx/5 + 1 << " DS" << (ds_idx%5) << ") failed" << std::endl << std::endl;
+		    << " (LINK " << fec_idx << " S" << (fec_idx%6) + 1 << " J" << ds_idx/5 + 1 << " DS" << (ds_idx%5) << ") FAILED" << std::endl << std::endl;
           success = false;
           break;
         }
