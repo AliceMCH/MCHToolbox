@@ -21,7 +21,8 @@ CRUIDX=$(echo "obase=16; $CRUID" | bc)
 #WIN=4000
 WIN=2000
 if [ x"${RUNTYPE}" = "xpedestals" ]; then
-    WIN=4200
+    #WIN=4200
+    WIN=8000
 fi
 if [ x"${RUNTYPE}" = "xhb_check" ]; then
     WIN=500
