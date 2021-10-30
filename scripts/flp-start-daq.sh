@@ -6,8 +6,14 @@ SCRIPT_DIR=$(pwd)
 
 FLPMAP=flp.map
 
+CHECK=0
+if [ "$1" = "-c" ]; then
+    CHECK=1
+    shift
+fi
+
 while read LINE; do
-    
+
     CRU=$(echo "$LINE" | cut -f 1)
     echo "CRU: $CRU"
 
@@ -37,3 +43,8 @@ while [ ! -e /tmp/readout.done ]; do
     clear
     ls -lht $HOME/Data/data-flp.raw | head -n 10
 done
+
+
+if [ x"$CHECK" = "x1" ]; then
+    ./flp-check-data.sh
+fi
