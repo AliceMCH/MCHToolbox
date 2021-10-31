@@ -68,8 +68,11 @@ echo "${LINKID} 35 $(( 16#42 ))" >> "$REGFILE"
 # clock enable
 for reg in 255 333 348; do
     for iter in $(seq 1 5); do
+	#echo "${LINKID} $reg 255" >> "$REGFILE"
+	P=$(echo -n "$PATT" | tail -c $(($iter*8)) | head -c 8)
+	INPATTREG=$(echo "ibase=2; $P" | bc)
 	#../GBT_IC/build/gbt-ic ${CRU_PCI_ADDR} "w" ${LINKID} $reg 255
-	echo "${LINKID} $reg 255" >> "$REGFILE"
+	echo "${LINKID} $reg $INPATTREG" >> "$REGFILE"
 	reg=$((reg+3))
     done
 done
