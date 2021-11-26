@@ -41,11 +41,12 @@ void gbtConfig(int linkid, o2::alf::roc::Parameters::CardIdType cardId1, o2::alf
   gCardIdMutex.unlock();
   for(auto& reg : *registers) {
     int retry;
-    for(retry = 0; retry < 10; retry++) {
+    for(retry = 0; retry < 3; retry++) {
+      success = true;
       try {
 	//printf("Writing 0x%X into GBT register %d of link %d\n", reg.second, reg.first, linkid);
 	ic.write(reg.first, reg.second);
-	std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	//std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	// GBT register readback seems to induce IC WRITE errors in some cases, so it is disabled
         //auto rval = ic.read(reg.first);
 	//if(rval != reg.second) {
@@ -57,9 +58,9 @@ void gbtConfig(int linkid, o2::alf::roc::Parameters::CardIdType cardId1, o2::alf
 	std::cerr << e.what() << std::endl;
 	success = false;
       }
-      break;
+      if(success) break;
     }
-    if(retry == 10) {
+    if(success == false) {
       gCardIdMutex.lock();
       std::cout << "SOLAR " << cardId << "/" << linkid_ << " failed" << std::endl;
       gCardIdMutex.unlock();
