@@ -18,7 +18,7 @@
 #include <mutex>
 #include <vector>
 
-//#define PARALLEL 1
+#define PARALLEL 1
 
 #include "Alf/Alf.h"
 #include "Alf/Lla.h"
