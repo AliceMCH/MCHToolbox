@@ -25,8 +25,6 @@
 
 using namespace o2::alf;
 
-static bool success = {true};
-
 static std::mutex gCardIdMutex;
 
 
@@ -39,22 +37,29 @@ void gbtConfig(int linkid, o2::alf::roc::Parameters::CardIdType cardId1, o2::alf
   //std::cout << "Creating GBT IC interface for card " << cardId << "/" << linkid_ << std::endl;
   o2::alf::Ic ic(cardId, linkid_);
   gCardIdMutex.unlock();
+
+  bool success;
+
   for(auto& reg : *registers) {
+
     int retry;
-    for(retry = 0; retry < 3; retry++) {
+    for(retry = 0; retry < 1; retry++) {
       success = true;
       try {
 	//printf("Writing 0x%X into GBT register %d of link %d\n", reg.second, reg.first, linkid);
 	ic.write(reg.first, reg.second);
-	//std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	// GBT register readback seems to induce IC WRITE errors in some cases, so it is disabled
-        //auto rval = ic.read(reg.first);
-	//if(rval != reg.second) {
-	//  printf("ERROR writing reg %d: %X != %X\n", reg.first, rval, reg.second);
-	//  continue;
-	//}
-	//std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	if (reg.first == 255) {
+	  auto rval = ic.read(reg.first);
+	  if(rval != reg.second) {
+	    printf("SOLAR %d/%d ERROR reading reg %d: %X != %X\n", cardId, linkid_, reg.first, rval, reg.second);
+	    success = false;
+	  }
+	  std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	}
       } catch (const IcException& e) {
+	std::cout << "SOLAR " << cardId << "/" << linkid_ << ": ";
 	std::cerr << e.what() << std::endl;
 	success = false;
       }
@@ -67,6 +72,7 @@ void gbtConfig(int linkid, o2::alf::roc::Parameters::CardIdType cardId1, o2::alf
       return;
     }
   }
+
   gCardIdMutex.lock();
   std::cout << "SOLAR " << cardId << "/" << linkid_ << " succesfully configured" << std::endl;
   gCardIdMutex.unlock();
