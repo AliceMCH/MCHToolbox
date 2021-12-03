@@ -127,7 +127,7 @@ int main(int argc, char** argv)
   o2::alf::roc::Parameters::CardIdType cardId = (linkid < 12) ? cardId1 : cardId2;
   linkid = linkid % 12;
 
-  std::cout << "Creating GBT IC interface for card " << cardId << "/" << linkid << std::endl;
+  //std::cout << "Creating GBT IC interface for card " << cardId << "/" << linkid << std::endl;
   auto ic = o2::alf::Ic(cardId, linkid);
     //auto ic = Ic(card, linkid);
     try {
@@ -148,7 +148,7 @@ int main(int argc, char** argv)
     o2::alf::roc::Parameters::CardIdType cardId = (linkid < 12) ? cardId1 : cardId2;
     linkid = linkid % 12;
 
-    std::cout << "Creating GBT IC interface for card " << cardId << "/" << linkid << std::endl;
+    //std::cout << "Creating GBT IC interface for card " << cardId << "/" << linkid << std::endl;
     auto ic = o2::alf::Ic(cardId, linkid);
     //auto ic = Ic(card, linkid);
     printf("Writing 0x%X into GBT register %d\n", val, reg);
@@ -178,7 +178,7 @@ int main(int argc, char** argv)
     o2::alf::roc::Parameters::CardIdType cardId = (linkid < 12) ? cardId1 : cardId2;
     linkid = linkid % 12;
 
-    std::cout << "Creating GBT IC interface for card " << cardId << "/" << linkid << std::endl;
+    //std::cout << "Creating GBT IC interface for card " << cardId << "/" << linkid << std::endl;
     auto ic = o2::alf::Ic(cardId, linkid);
     //auto ic = Ic(card, linkid);
     for(int reg = 0; reg <= 368; reg++) {

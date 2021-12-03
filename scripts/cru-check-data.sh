@@ -10,6 +10,9 @@ if [ -z "$FILE" ]; then
     FILE=$HOME/Data/data-${CRU}.raw
 fi
 
+shift 2
+OPTS="$*"
+
 #(cd ${SCRIPTDIR}/../tools/Decode && make)
 #source setup.sh
 
@@ -34,12 +37,12 @@ done
 
 
 if [ x"${CRU_UL_ENABLED}" = "x1" ]; then
-    echo "${SCRIPTDIR}/../tools/command-line/build/cru-decode-ul -c $CRU -d 0 -n $BOARDS $FILE"
-    ${SCRIPTDIR}/../tools/command-line/build/cru-decode-ul -c $CRU -d 0 -n $BOARDS "$FILE"
+    echo "${SCRIPTDIR}/../tools/command-line/build/cru-decode-ul -c $CRU -d 0 $OPTS $BOARDS $FILE"
+    ${SCRIPTDIR}/../tools/command-line/build/cru-decode-ul -c $CRU -d 0 $OPTS $BOARDS "$FILE"
 else
 #gdb -ex run 
-    echo "${SCRIPTDIR}/../tools/command-line/build/cru-decode -c $1 -d 0 -n $BOARDS $FILE"
-    ${SCRIPTDIR}/../tools/command-line/build/cru-decode -c $CRU -d 0 -n $BOARDS "$FILE" #| tee $HOME/decode.log
+    echo "${SCRIPTDIR}/../tools/command-line/build/cru-decode -c $1 -d 0 $OPTS $BOARDS $FILE"
+    ${SCRIPTDIR}/../tools/command-line/build/cru-decode -c $CRU -d 0 $OPTS $BOARDS "$FILE" #| tee $HOME/decode.log
 fi
 
 #read dummy
