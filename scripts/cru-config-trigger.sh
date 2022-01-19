@@ -69,9 +69,9 @@ fi
 echo "CONTINUOUS ${CONTINUOUS}"
 
 if [ x"${CONTINUOUS}" = "x1" ]; then
-    echo "roc-pat-player --id=${CRU_PCI_ADDR} --idle=${PATT_IDLE} --sync=${PATT_HBTR} --reset=${PATT_SYNC} --sync-length=1 --sync-delay=0 --sync-trigger-select=11 --reset-trigger-select=12"
+    echo "roc-pat-player --id=${CRU_PCI_ADDR} --idle=${PATT_IDLE} --sync=${PATT_HBTR_SYNC} --reset=${PATT_SYNC} --sync-length=1 --sync-delay=0 --sync-trigger-select=11 --reset-trigger-select=12"
     roc-pat-player --id=${CRU_PCI_ADDR} --idle=${PATT_IDLE} \
-	--sync=${PATT_HBTR} \
+	--sync=${PATT_HBTR} \ #${PATT_HBTR_SYNC} \ #${PATT_HBTR} \
 	--reset=${PATT_SYNC} \
 	--sync-length=1 --sync-delay=0 --sync-trigger-select=11 --reset-trigger-select=12
 
