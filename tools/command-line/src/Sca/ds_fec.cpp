@@ -403,3 +403,90 @@ DsFec::sampaConfigure(std::string filename, int16_t sampa_id, uint8_t nRetry, bo
   //if( os ) sampa2.dumpRegisters(*os);
   return( !failed );
 }
+
+
+bool
+DsFec::sampaDumpConfiguration(std::string filename, std::string dumpFileName, int16_t sampa_id, uint8_t nRetry, std::ostream* const os) const
+{
+  const gbt::ScaI2c& sampa(*i2c_sampa_[sampa_id]);
+  gbt::ScaI2c* psampa = i2c_sampa_[sampa_id].get();
+  Sampa& sampa2 = getSampa(sampa_id);
+  Sampa* psampa2 = sampa_[sampa_id].get();
+
+  std::ifstream infile(filename);
+  if( !infile ) {
+    if(os) *os <<"Input file "<<filename<<" not correctly opened\n";
+    return false;
+  }
+
+  std::ofstream dumpFile(dumpFileName);
+   if( !dumpFile ) {
+    if(os) *os <<"Output file "<<dumpFileName<<" not correctly opened\n";
+    return false;
+  }
+ 
+  std::string line;
+  bool failed = false;
+  while (std::getline(infile, line)) {
+    //if(os) *os <<"Line: \""<<line<<"\"\n";
+    if(line.empty()) continue;
+    if(line[0] == '#') continue;
+    std::istringstream iss(line);
+    std::string a, b, c="-1";
+    //if (!(iss >> a >> b)) { continue; } // error
+    //if(os) *os <<"a: \""<<a<<"\"    b:\""<<b<<"\""<<std::endl;
+    int32_t ia; // = convertSampaRegister(a,os);
+    int32_t ib; // = convertSampaRegister(b,os);
+    int32_t ic; // = convertSampaRegister(c,os);
+    //if(os) *os<<"  ia: 0x"<<std::hex<<ia<<" ("<<std::dec<<ia<<")  ib: 0x"<<std::hex<<ib<<" ("<<std::dec<<ib<<")\n";
+    sscanf(line.c_str(), "%i %i %i", &ic, &ia, &ib);
+    if(ia < 0 || ib < 0) return false;
+
+    sampa2.set_readback(false);
+    sampa2.set_nretries(nRetry);
+
+    // read register from SAMPA
+    bool read_failed = true;
+    try {
+      if (false && os) {
+        *os << "  Writing SAMPA register: SAMPA " << static_cast<uint32_t>(sampa_id)
+	        << " [I2C addr " << sampa.getSlaveAddress()
+	        << ", SCA CH" << static_cast<uint32_t>(sampa.getChannel()) <<"], [reg 0x"
+	        << std::hex << ia << ", value 0x" << ib << std::dec << "]\n";
+      }
+      //uint8_t val = sampa.writeByte(ia, ib); //usleep(100000);
+      //sampa.readByte(ia);
+      bool val2;
+      uint8_t val8;
+      uint16_t val16;
+      if( ic < 0 ) {
+        val2 = sampa_[sampa_id]->readRegister(ia, val8);
+	if( val2 ) {
+	  char tstr[501];
+	  snprintf(tstr, 500, "-1 0x%02x 0x%02x", (int)ia, (int)val8);
+	  dumpFile << tstr << std::endl;
+	}
+      } else {
+        val2 = sampa_[sampa_id]->readChannelRegister(ic, ia, val16);
+	if( val2 ) {
+	  char tstr[501];
+	  snprintf(tstr, 500, "%d 0x%02x 0x%04x", (int)ic, (int)ia, (int)val16);
+	  dumpFile << tstr << std::endl;
+	}
+      }
+
+      if( val2 ) { read_failed = false; continue; }
+    }
+    catch(gbt::ScaException& e) {
+      /* Ignore these here */ 
+      if(os) {
+        *os << e.what();
+      }
+    }
+
+    if( read_failed ) { failed = true; break; }
+    //break;
+  }
+  //if( os ) sampa2.dumpRegisters(*os);
+  return( !failed );
+}

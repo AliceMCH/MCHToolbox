@@ -419,6 +419,12 @@ class DsFec : public common::BitManipulation
      */
     bool sampaConfigure(std::string filename, int16_t sampa_id, uint8_t nRetry = 10, bool readBack = false, std::ostream* const os = nullptr) const;
 
+    /** Reads the unique ID of the SOLAR board
+     *  @param os Pointer to output stream or nullptr if printing is not desired
+     *  @return The SOLAR unique ID
+     */
+  bool sampaDumpConfiguration(std::string filename, std::string dumpFileName, int16_t sampa_id, uint8_t nRetry = 10, std::ostream* const os = nullptr) const;
+
     /** Get SAMPA clock configuration
      * @return Sampa clock configuration
      * @note Available on FEC >= rev1 only
