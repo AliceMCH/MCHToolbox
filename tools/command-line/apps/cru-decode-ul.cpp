@@ -353,8 +353,8 @@ decode_state_t Add10BitsOfData(uint64_t data, DualSampa& dsr, DualSampaGroup* ds
         memcpy(&(dsr.header),&(dsr.data),sizeof(Sampa::SampaHeaderStruct));
         Sampa::SampaHeaderStruct* header = (Sampa::SampaHeaderStruct*)&(dsr.header);
         if(gPrintLevel >= 1) {
-          printf("[L %d DS %d CH %d]  Header[%d](%03X %03X %03X %03X %03X): HCode %2d HPar %d PkgType %d 10BitWords %d ChipAdd %d ChAdd %2d BX %d PPar %d\n",
-		 (int)dsr.lid, (int)dsr.id, (int)dsr.header.fChannelAddress,
+          printf("[L %d B %d DS %d CH %d]  Header[%d](%03X %03X %03X %03X %03X): HCode %2d HPar %d PkgType %d 10BitWords %d ChipAdd %d ChAdd %2d BX %d PPar %d\n",
+		 (int)dsr.lid, dsr.lid*40+dsr.id, (int)dsr.id, (int)dsr.header.fChannelAddress,
 		 dsr.nHeaders, 
 		 ((dsr.data >> 40) & 0x3FF),
 		 ((dsr.data >> 30) & 0x3FF),
@@ -652,11 +652,11 @@ int main(int argc, char** argv)
       if( (nFrames%1000000 == 0) || false ||
           (nFrames > nskip && gPrintLevel >= 1 /*&& cru_id == target_cru_id*/ /*&& CRUh.block_length > 0*/) ) {
 	//printf("nFrames=%d  skip=%d  end=%d\n", nFrames, nskip, end);
-	printf("%6d:  version %X  memsz %4d  offset %4d  packet %3d  srcID %d  cruID %2d  dp %d  feeID %04X  link %2d  orbit %u  bc %4d  trig 0x%08X  page %d  stop %d\n",
+	printf("%6d:  version %X  memsz %4d  offset %4d  packet %3d  srcID %d  cruID %2d  dp %d  feeID %04X  link %2d  orbit %u  bc %4d  trig 0x%08X  page %d  stop %d  UL version %X\n",
 	       nFrames, (int)rdh.version, (int)rdh.memorySize, (int)rdh.offsetToNext,
 	       (int)rdh.packetCounter, (int)rdh.sourceID, (int)rdh.cruID, (int)rdh.endPointID, (int)rdh.feeId, (int)rdh.linkID,
 	       rdh.orbit, (int)rdh.bunchCrossing, rdh.triggerType, (int)rdh.pageCnt,
-	       (int)rdh.stopBit);
+	       (int)rdh.stopBit, (int)(rdh.word6 & 0xFFFF));
 	if(false && CRUh.block_length > 0) 
 	  printf("HBF size: %d\nPayload size: %d\nN. of 256-bit words: %f\n",
 		 (int)CRUh.memory_size, (int)CRUh.block_length, ((float)CRUh.block_length) / 256);
