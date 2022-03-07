@@ -22,6 +22,16 @@ where the numerical parameter is an integer from 0 to 9, with the following mean
 
 Each time the run type is changed the CRUs need to be re-configured (see next section).
 
+## CRU clock source configuration
+
+The clock source for the CRU boards can be configured with the following command:
+```
+./set-clock-source.sh [local,ttc]
+```
+
+For normal data taking with AliECS the clock source must be set to `ttc`.
+The local clock source can be used when doing standalone tests on one single CRU, and therefore the use of the LTU/CTP is not needed.
+
 ## CRU configuration
 
 The CRU parameters that control the front-end configuration and data taking
