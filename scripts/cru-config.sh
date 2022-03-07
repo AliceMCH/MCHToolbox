@@ -63,8 +63,8 @@ if [ x"${CRU_UL_ENABLED}" = "x1" ]; then
     bash ./cru-set-feeid.sh $CRU
 fi
 
-#LINKS_PATT="0x00000000"
-LINKS_PATT="0x0FFF0FFF"
+LINKS_PATT="0x00000000"
+#LINKS_PATT="0x0FFF0FFF"
 echo "Setting links pattern for CRU $CRU to ${LINKS_PATT}"
 echo "roc-reg-write --id=${CRU_PCI_ADDR} --channel=2 --address=0xc80008 --value=\"${LINKS_PATT}\""
 roc-reg-write --id=${CRU_PCI_ADDR} --channel=2 --address=0xc80008 --value="${LINKS_PATT}"
