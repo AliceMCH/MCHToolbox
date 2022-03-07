@@ -4,14 +4,19 @@ SCRIPTDIR=$(readlink -f $(dirname $0))
 
 CRU=$1
 source ${SCRIPTDIR}/env-${CRU}.sh
+shift
 
-FILE=$2
+FILE=$1
 if [ -z "$FILE" ]; then
     FILE=$HOME/Data/data-${CRU}.raw
+else
+    shift
 fi
 
-shift 2
+#shift 2
 OPTS="$*"
+
+echo "Extra options: $OPTS"
 
 #(cd ${SCRIPTDIR}/../tools/Decode && make)
 #source setup.sh
@@ -41,8 +46,8 @@ if [ x"${CRU_UL_ENABLED}" = "x1" ]; then
     ${SCRIPTDIR}/../tools/command-line/build/cru-decode-ul -c $CRU -d 0 $OPTS $BOARDS "$FILE"
 else
 #gdb -ex run 
-    echo "${SCRIPTDIR}/../tools/command-line/build/cru-decode -c $1 -d 0 $OPTS $BOARDS $FILE"
-    ${SCRIPTDIR}/../tools/command-line/build/cru-decode -c $CRU -d 0 $OPTS $BOARDS "$FILE" #| tee $HOME/decode.log
+    echo "${SCRIPTDIR}/../tools/command-line/build/cru-decode -c $1 -d 0 $OPTS $BOARDS -n $FILE"
+    ${SCRIPTDIR}/../tools/command-line/build/cru-decode -c $CRU -d 0 $OPTS $BOARDS -n "$FILE" #| tee $HOME/decode.log
 fi
 
 #read dummy
