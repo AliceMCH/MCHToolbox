@@ -10,7 +10,7 @@ source ${SCRIPTDIR}/env-${CRU}.sh
 echo "${RUNTYPE}"
 SAMPLES=5
 if [ x"${RUNTYPE}" = "xpedestals_ul" ]; then
-    SAMPLES=18
+    SAMPLES=13
 fi
 
 
@@ -87,7 +87,7 @@ for CRU_LINK in $(seq 0 23); do
 		    NOISE=$(echo "$LINE" | tr -s " " | cut -d" " -f 7)
 		    #echo "PED: $PED"
 		    #echo "NOISE: $NOISE"
-		    if (( $(echo "($NOISE > $THR) || ($PED > 150)" | bc -l) )); then
+		    if (( $(echo "($NOISE > $THR) || ($PED > 500)" | bc -l) )); then
 			echo "Switching off channel: $LINE"
 			./sampa-set-chan-threshold.sh /tmp/config_sampa_${CRU_LINK}_${DS}_${CHIP}.txt $CHAN 0xFF
 			NDISABLED=$((NDISABLED+1))
