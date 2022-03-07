@@ -29,7 +29,7 @@ HBKEEP=256
 HBDROP=$((256-HBKEEP))
 
 echo "roc-ctp-emulator --id=${CRU_PCI_ADDR} --trigger-mode=${TRIGMODE} --trigger-freq=$TRIGRATE"
-roc-ctp-emulator --id=${CRU_PCI_ADDR} --trigger-mode=${TRIGMODE} --trigger-freq=$TRIGRATE --hbmax=255 #--hbkeep=$HBKEEP --hbdrop=$HBDROP
+roc-ctp-emulator --id=${CRU_PCI_ADDR} --trigger-mode=${TRIGMODE} --trigger-freq=$TRIGRATE --hbmax=127 #--hbkeep=$HBKEEP --hbdrop=$HBDROP
 
 
 echo ""
