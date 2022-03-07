@@ -53,7 +53,9 @@ void gbtConfig(int linkid, o2::alf::roc::Parameters::CardIdType cardId1, o2::alf
 	if (reg.first == 255) {
 	  auto rval = ic.read(reg.first);
 	  if(rval != reg.second) {
-	    printf("SOLAR %d/%d ERROR reading reg %d: %X != %X\n", cardId, linkid_, reg.first, rval, reg.second);
+	    std::ostringstream ostr;
+	    ostr << cardId;
+	    printf("SOLAR %s/%d ERROR reading reg %d: %X != %X\n", ostr.str().c_str(), linkid_, reg.first, rval, reg.second);
 	    success = false;
 	  }
 	  std::this_thread::sleep_for(std::chrono::milliseconds(10));
