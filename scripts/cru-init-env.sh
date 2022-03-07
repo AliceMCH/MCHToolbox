@@ -2,17 +2,15 @@
 
 CRU=$1
 
+source clksource.sh
 source runtype.sh
 
-echo "RUNTYPE: $RUNTYPE"
+echo "CRU_CLKSRC: ${CRU_CLKSRC}"
+echo "RUNTYPE:    $RUNTYPE"
 
 export I2C_RETRIES=2
 
-#CRU_CLKSRC=local
-CRU_CLKSRC=ttc
-
-
-export ADC_THR=0C
+export ADC_THR=08
 export NOISE_THR=2.0
 
 
