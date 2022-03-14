@@ -28,8 +28,9 @@ using namespace o2::alf;
 static std::mutex gCardIdMutex;
 
 
-void gbtConfig(int linkid, o2::alf::roc::Parameters::CardIdType cardId1, o2::alf::roc::Parameters::CardIdType cardId2, std::vector<std::pair<uint32_t, uint32_t>>* registers)
+void gbtConfig(int linkid, o2::alf::roc::Parameters::CardIdType cardId1, o2::alf::roc::Parameters::CardIdType cardId2, std::vector<std::pair<uint32_t, uint32_t>>* registers, bool* success)
 {
+  *success = true;
   if(registers->empty()) return;
   gCardIdMutex.lock();
   o2::alf::roc::Parameters::CardIdType cardId = (linkid < 12) ? cardId1 : cardId2;
@@ -38,13 +39,11 @@ void gbtConfig(int linkid, o2::alf::roc::Parameters::CardIdType cardId1, o2::alf
   o2::alf::Ic ic(cardId, linkid_);
   gCardIdMutex.unlock();
 
-  bool success;
-
   for(auto& reg : *registers) {
 
     int retry;
     for(retry = 0; retry < 1; retry++) {
-      success = true;
+      *success = true;
       try {
 	//printf("Writing 0x%X into GBT register %d of link %d\n", reg.second, reg.first, linkid);
 	ic.write(reg.first, reg.second);
@@ -56,18 +55,18 @@ void gbtConfig(int linkid, o2::alf::roc::Parameters::CardIdType cardId1, o2::alf
 	    std::ostringstream ostr;
 	    ostr << cardId;
 	    printf("SOLAR %s/%d ERROR reading reg %d: %X != %X\n", ostr.str().c_str(), linkid_, reg.first, rval, reg.second);
-	    success = false;
+	    *success = false;
 	  }
 	  std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
       } catch (const IcException& e) {
 	std::cout << "SOLAR " << cardId << "/" << linkid_ << ": ";
 	std::cerr << e.what() << std::endl;
-	success = false;
+	*success = false;
       }
-      if(success) break;
+      if(*success) break;
     }
-    if(success == false) {
+    if(*success == false) {
       gCardIdMutex.lock();
       std::cout << "SOLAR " << cardId << "/" << linkid_ << " failed" << std::endl;
       gCardIdMutex.unlock();
@@ -80,9 +79,10 @@ void gbtConfig(int linkid, o2::alf::roc::Parameters::CardIdType cardId1, o2::alf
   gCardIdMutex.unlock();
 }
 
-void readFile(std::string regfile, o2::alf::roc::Parameters::CardIdType& cardId1, o2::alf::roc::Parameters::CardIdType& cardId2)
+bool readFile(std::string regfile, o2::alf::roc::Parameters::CardIdType& cardId1, o2::alf::roc::Parameters::CardIdType& cardId2)
 {
   std::vector<std::pair<uint32_t, uint32_t>> registers[24];
+  bool success[24];
   FILE* f  = fopen(regfile.c_str(),"r");
   //auto ic = Ic(card, linkid);
   uint32_t linkid, reg=0, val;
@@ -93,16 +93,22 @@ void readFile(std::string regfile, o2::alf::roc::Parameters::CardIdType& cardId1
 #ifdef PARALLEL
   std::vector<std::thread> workers;
   for(int linkid = 0; linkid < 24; linkid++) {
-    workers.push_back(std::thread(gbtConfig, linkid, cardId1, cardId2, &(registers[linkid])));
+    workers.push_back(std::thread(gbtConfig, linkid, cardId1, cardId2, &(registers[linkid]), &(success[linkid])));
   }
   for(auto& t : workers) {
     t.join();
   }
 #else
   for(int linkid = 0; linkid < 24; linkid++) {
-    gbtConfig(linkid, cardId1, cardId2, &(registers[linkid]));
+    gbtConfig(linkid, cardId1, cardId2, &(registers[linkid]), &(success[linkid]));
   }
 #endif
+  
+  for (int i = 0; i < 24; i++) {
+    //std::cout << "success[" << i << "]: " << success[i] << std::endl;
+    if (!success[i]) return false;
+  }
+  return true;
 }
 
 
@@ -171,7 +177,10 @@ int main(int argc, char** argv)
   }
 
   if(command == 'f') {
-    readFile(argv[4], cardId1, cardId2);
+    if (!readFile(argv[4], cardId1, cardId2)) {
+      llaSession->stop();
+      return 1;
+    }
   }
 
   if(command == 'd') {

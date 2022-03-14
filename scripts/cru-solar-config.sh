@@ -61,7 +61,17 @@ GBTCMD=../tools/command-line/build/gbt-config
 
 echo "Configuring ${CRU}/${CRU_PCI_ADDR}"
 echo "$GBTCMD ${CRU_PCI_ADDR1} ${CRU_PCI_ADDR2} \"f\" \"$REGFILE\""
-$GBTCMD ${CRU_PCI_ADDR1} ${CRU_PCI_ADDR2} "f" "$REGFILE" || exit 1
+while [ true ]; do
+    $GBTCMD ${CRU_PCI_ADDR1} ${CRU_PCI_ADDR2} "f" "$REGFILE"
+    if [ $? -eq 0 ]; then
+	break
+    fi
+    echo ""; echo "";
+    RED='\033[0;31m'
+    NC='\033[0m' # No Color
+    echo -n -e "${RED}Some SOLAR boards did not configure properly, please try to power-cycle the corresponding crates and press enter...${NC}"
+    read dummy
+done
 
 
 sleep 1
