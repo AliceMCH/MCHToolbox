@@ -8,13 +8,23 @@ if [ -z "$FILE" ]; then
 fi
 
 while read LINE; do
-    
+
     CRU=$(echo "$LINE" | cut -f 1)
-    
+
     if [ -n "$CRU" ]; then
 	#./cru_get_links.sh $CRU
 	./cru-check-data.sh $CRU "$FILE" >& log-${CRU}.txt
 	echo "log-${CRU}.txt created"
     fi
-    
+
+done < "$FLPMAP"
+
+while read LINE; do
+
+    CRU=$(echo "$LINE" | cut -f 1)
+
+    if [ -n "$CRU" ]; then
+	less log-${CRU}.txt
+    fi
+
 done < "$FLPMAP"
