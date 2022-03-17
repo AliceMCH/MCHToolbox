@@ -46,3 +46,4 @@ scripts/board-enable-*.txt
 scripts/config_sampa*.txt
 scripts/solar-clock-phase-*.txt
 scripts/gbtx-regs-*.txt
+scripts/sampa_dump_*.txt
