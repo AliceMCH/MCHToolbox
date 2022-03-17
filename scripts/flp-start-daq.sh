@@ -15,11 +15,11 @@ fi
 while read LINE; do
 
     CRU=$(echo "$LINE" | cut -f 1)
-    echo "CRU: $CRU"
+    #echo "CRU: $CRU"
 
-    if [ -n "$CRU" ]; then
-	./cru-config-trigger.sh $CRU
-    fi
+    #if [ -n "$CRU" ]; then
+    #    ./cru-config-trigger.sh $CRU
+    #fi
 done < $FLPMAP
 
 #xterm -bg black -fg white -geometry 100x15+0+0 -e watch -n 0.9 ${SCRIPT_DIR}/check-packets-loss.sh  &

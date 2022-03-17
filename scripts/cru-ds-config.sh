@@ -14,7 +14,9 @@ if [ x"${RUNTYPE}" = "xpedestals_ul" ]; then
 fi
 
 
-bash ./cru-send-hard-reset.sh $CRU
+./cru-send-hard-reset.sh $CRU
+
+./cru-config-trigger.sh $CRU
 
 #bash ./gen_sampa_config_reset.sh
 
@@ -127,7 +129,4 @@ for I in $(seq 1 1); do
 done
 
 
-./cru-config-trigger.sh $CRU
-
- 
 exit $ERROR

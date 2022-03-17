@@ -17,7 +17,7 @@ SCRIPTDIR=$(readlink -f $(dirname $0))
 source ${SCRIPTDIR}/env-${CRU}.sh
 
 
-./cru-config-trigger.sh $CRU
+#./cru-config-trigger.sh $CRU
 
 #xterm -bg black -fg white -geometry 100x15+0+780 -e watch -n 0.9 ${SCRIPT_DIR}/check-packets-loss.sh  &
 
