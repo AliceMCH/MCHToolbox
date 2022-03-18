@@ -12,7 +12,7 @@ int gNbErrors;
 int gNbWarnings;
 
 
-bool BXCNT_compare(int64_t c1, int64_t c2)
+static bool BXCNT_compare(int64_t c1, int64_t c2)
 {
   //return true;
   const int64_t MAX = 0xFFFFF;

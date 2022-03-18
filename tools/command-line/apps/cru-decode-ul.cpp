@@ -282,6 +282,22 @@ struct RAWDataHeaderV6 {
 
 
 
+static bool BXCNT_compare(int64_t c1, int64_t c2)
+{
+  //return true;
+  const int64_t MAX = 0xFFFFF;
+  int64_t diff = c1 - c2;
+  if(diff >= MAX) diff -= MAX;
+  if(diff <= -MAX) diff += MAX;
+  int64_t c1p = (c1+1) & MAX;
+  int64_t c2p = (c2+1) & MAX;
+  if( c1 == c2 ) return true;
+  //if( c1p == c2 ) return true;
+  //if( c2p == c1 ) return true;
+  return false;
+}
+
+
 decode_state_t Add10BitsOfData(uint64_t data, DualSampa& dsr, DualSampaGroup* dsg)
 {
   decode_state_t result = DECODE_STATE_UNKNOWN;
@@ -385,6 +401,20 @@ decode_state_t Add10BitsOfData(uint64_t data, DualSampa& dsr, DualSampaGroup* ds
 	} else if (header->fPkgType == 4) {
 	  dsr.status = sizeToRead;
 	  result = DECODE_STATE_HEADER_FOUND;
+	  
+	  int link = dsr.id / 5;
+	  if( gPrintLevel >= 1 ) printf("SAMPA [%2d]: BX counter for link %d is %d\n", dsr.id, link, dsg->bxc);
+	  if( true && dsg && dsg->bxc >= 0 ) {
+	    if( !BXCNT_compare(dsg->bxc, dsr.header.fBunchCrossingCounter) ) {
+	      printf("===> ERROR SAMPA [L %02d, DS %02d (J%1d,%1d), B %3d]: ChipAdd %d ChAdd %2d BX %d, expected %d, diff %d\n",
+		     dsr.lid,dsr.id,dsr.id/5+1,dsr.id%5,(dsr.lid*40+dsr.id), dsr.header.fChipAddress,dsr.header.fChannelAddress,
+		     dsr.header.fBunchCrossingCounter, dsg->bxc,
+		     dsr.header.fBunchCrossingCounter-dsg->bxc);
+	    }
+	  } else {
+	    dsg->bxc = dsr.header.fBunchCrossingCounter;
+	    if( gPrintLevel >= 1 ) printf("SAMPA [%2d]: BX counter for link %d set to %d\n", dsr.id, link, dsg->bxc);
+	  }
 	} else {
 	    printf("ERROR: [L %d B %d DS %d CHIP %d CH %d] unrecognized packet type\n", dsr.lid, dsr.lid*40+dsr.id, dsr.id, (int)dsr.header.fChipAddress, (int)dsr.header.fChannelAddress);
 	    dsr.status = notSynchronized;
