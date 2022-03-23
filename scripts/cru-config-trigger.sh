@@ -5,17 +5,7 @@ CRU=$1
 SCRIPTDIR=$(readlink -f $(dirname $0))
 source ${SCRIPTDIR}/env-${CRU}.sh
 
-
-
-if [ x"${CRU_CLKSRC}" = "xlocal" ]; then
-    roc-ctp-emulator --id=${CRU_PCI_ADDR} --eox
-
-    # Send bunch crossing reset signal
-    roc-pat-player --id=${CRU_PCI_ADDR} --idle=${PATT_IDLE} \
-	--sync=${PATT_SYNC} \
-	--sync-length=1 --sync-delay=0 --sync-trigger-select=4 --trigger-sync
-fi
-
+echo "Configuring trigger for CRU $CRU"
 
 if [ x"$RUNTYPE" = "xpedestals" ]; then
     PATT1=${PATT_IDLE}
