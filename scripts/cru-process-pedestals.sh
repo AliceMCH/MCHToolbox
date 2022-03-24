@@ -11,7 +11,7 @@ if [ -z "$FILE" ]; then
     FILE=$HOME/Data/data-${CRU}.raw
 fi
 
-if [ x"${CRU_UL_ENABLED}" = "x1" ]; then
+if [ x"${_CRU_UL_ENABLED}" = "x1" ]; then
     echo "${SCRIPTDIR}/../tools/command-line/build/cru-decode-ul -c $CRU -d 0 -n $FILE"
     ${SCRIPTDIR}/../tools/command-line/build/cru-decode-ul -c $CRU -d 0 -n "$FILE"
 else
