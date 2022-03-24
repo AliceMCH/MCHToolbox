@@ -21,7 +21,6 @@ fi
 #bash ./gen_sampa_config_reset.sh
 
 PEDESTALS=0
-THR=${NOISE_THR}
 RETRIES=${I2C_RETRIES}
 
 if [ x"$RUNTYPE" = "xpedestals" -o x"$RUNTYPE" = "xpedestals_ul" -o x"$RUNTYPE" = "xhb_check" -o x"$RUNTYPE" = "xber_check" ]; then
@@ -89,7 +88,7 @@ for CRU_LINK in $(seq 0 23); do
 		    NOISE=$(echo "$LINE" | tr -s " " | cut -d" " -f 7)
 		    #echo "PED: $PED"
 		    #echo "NOISE: $NOISE"
-		    if (( $(echo "($NOISE > $THR) || ($PED > 500)" | bc -l) )); then
+		    if (( $(echo "($NOISE > ${NOISE_THR}) || ($PED > ${PED_THR})" | bc -l) )); then
 			echo "Switching off channel: $LINE"
 			./sampa-set-chan-threshold.sh /tmp/config_sampa_${CRU_LINK}_${DS}_${CHIP}.txt $CHAN 0xFF
 			NDISABLED=$((NDISABLED+1))

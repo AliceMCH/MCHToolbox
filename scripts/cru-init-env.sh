@@ -11,6 +11,8 @@ echo "RUNTYPE:    $RUNTYPE"
 export I2C_RETRIES=2
 
 export ADC_THR=0C
+
+export PED_THR=500
 export NOISE_THR=2.0
 
 
@@ -196,6 +198,7 @@ echo "export PATT_PHYS=${PATT_PHYS}" >> ${ENVFILE}
 echo "export PATT_HBTR=${PATT_HBTR}" >> ${ENVFILE}
 echo "export PATT_SYNC=${PATT_SYNC}" >> ${ENVFILE}
 echo "export PATT_HBTR_SYNC=${PATT_HBTR_SYNC}" >> ${ENVFILE}
+echo "export PED_THR=${PED_THR}" >> ${ENVFILE}
 echo "export NOISE_THR=${NOISE_THR}" >> ${ENVFILE}
 echo "export ADC_THR=${ADC_THR}" >> ${ENVFILE}
 echo "export I2C_RETRIES=${I2C_RETRIES}" >> ${ENVFILE}
