@@ -757,7 +757,7 @@ int main(int argc, char** argv)
     int Dorbit2 = (uint32_t)( ((uint64_t)CRUh.hb_orbit) + 0x100000000 - hb_orbit );
     if( Dorbit1 >=0 && Dorbit1 <= 1 ) orbit_jump = false;
     if( Dorbit2 >=0 && Dorbit2 <= 1 ) orbit_jump = false;
-    if( false && orbit_jump ) {
+    if( orbit_jump ) {
       //printf("Resetting decoding FSM\n");
       for(int c = 0; c < NCRU; c++) {
         for(int l = 0; l < 24; l++) {
