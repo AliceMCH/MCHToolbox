@@ -56,6 +56,14 @@ done
 
 echo ""
 
+echo ""; echo "";
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+echo -e "${RED}Please power-cycle the following SOLAR crates and press enter...${NC}"
+echo -n $CRATES
+read dummy
+
+
 if [ ! -z "$CRATES" ]; then
     echo "./reload-solar-crates.sh $CRATES"
     ./reload-solar-crates.sh $CRATES
