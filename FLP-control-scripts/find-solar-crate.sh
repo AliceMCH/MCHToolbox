@@ -5,7 +5,6 @@ CRATE=$1
 CRUMAPS=$(ls -1 ../Mapping/cru-*.map)
 NCRUMAPS=$(echo "$CRUMAPS" | wc -l)
 
-FLPS=""
 CRUS=""
 
 function add_CRU
@@ -13,7 +12,7 @@ function add_CRU
     local CRU=$1
     local i=1
     while [ true ]; do
-	C=$(echo "$CRUS" | cut -d" " -f $i)
+	C=$(echo "$CRUS" | tr " " "\n" | sed -n ${i}p)
 	if [ -z "$C" ]; then break; fi
 	if [ x"$C" = x"$CRU" ]; then return; fi
 	i=$((i+1))
@@ -22,13 +21,6 @@ function add_CRU
 	CRUS=$CRU
     else
 	CRUS="$CRUS $CRU"
-    fi
-    
-    FLP=$(($CRU/3+148))
-    if [ -z "$FLPS" ]; then
-	FLPS=$FLP
-    else
-	FLPS="$FLPS $FLP"
     fi
 }
 
@@ -53,5 +45,4 @@ for I in $(seq 1 $NCRUMAPS); do
 
 done
 
-echo "$FLPS"
 echo "$CRUS"
