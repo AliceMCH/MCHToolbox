@@ -2,7 +2,7 @@
 
 CRATE=$1
 
-CRUMAPS=$(ls -1 Mapping/cru-*.map)
+CRUMAPS=$(ls -1 ../Mapping/cru-*.map)
 NCRUMAPS=$(echo "$CRUMAPS" | wc -l)
 
 FLPS=""
