@@ -60,6 +60,8 @@ void fecConfig(int fec_idx, std::string pci_addr_str1, std::string pci_addr_str2
     int linkId = fec_idx % 12;
     std::unique_ptr<cru::HdlcAlf> hdlc_core(new cru::HdlcAlf(cardId, linkId, true));
     //cru::HdlcAlf* hdlc_core = new cru::HdlcAlf(cardId, fec_idx, true);
+
+    o2::alf::Ic ic(cardId, linkId);
     gCardIdMutex.unlock();
 #else
     std::unique_ptr<common::Bar> bar;
@@ -97,12 +99,15 @@ void fecConfig(int fec_idx, std::string pci_addr_str1, std::string pci_addr_str2
       auto cf0 = cfg.cf0;
       auto cf1 = cfg.cf1;
 
+      bool dsOK = true;
+
       for(int iter = 0; iter < 1; iter++) {
         //std::cout << "Loading SAMPA registers" << std::endl;
         if( !fec.sampaConfigure(cf0, ds_idx*2, retries, readback, &std::cout) ) {
           std::cout << "ERROR: Configuration of SAMPA chip " << fec_idx << ":" << ds_idx*2
 		    << " (LINK " << fec_idx << " S" << (fec_idx%6) + 1 << " J" << ds_idx/5 + 1 << " DS" << (ds_idx%5) << ") FAILED" << std::endl << std::endl;
           success = false;
+	  dsOK = false;
           break;
         }
         //std::cout<<"SAMPA "<< fec_idx << ":" << ds_idx*2<<" succesfully configured\n";
@@ -110,9 +115,54 @@ void fecConfig(int fec_idx, std::string pci_addr_str1, std::string pci_addr_str2
           std::cout << "ERROR: Configuration of SAMPA chip " << fec_idx << ":" << ds_idx*2+1
 		    << " (LINK " << fec_idx << " S" << (fec_idx%6) + 1 << " J" << ds_idx/5 + 1 << " DS" << (ds_idx%5) << ") FAILED" << std::endl << std::endl;
           success = false;
+	  dsOK = false;
           break;
         }
         //std::cout<<"SAMPA "<< fec_idx << ":" << ds_idx*2+1<<" succesfully configured\n";
+      }
+
+      if (!dsOK) {
+	  std::cout << "Disabling DS board (LINK " << fec_idx << " S" << (fec_idx%6) + 1 << " J" << ds_idx/5 + 1 << " DS" << (ds_idx%5) << ")" << std::endl << std::endl;
+	// disable the corresponding e-Link
+	// offset between clock enable registers
+	int regOffset = (ds_idx / 8 ) * 3;
+	// offset between input enable registers
+	int regOffset2 = (ds_idx / 8 ) * 24;
+	
+	// read the bit pattern
+	ic.read(255 + regOffset);
+	std::this_thread::sleep_for(std::chrono::milliseconds(1));
+	auto rval = ic.read(255 + regOffset);
+	std::this_thread::sleep_for(std::chrono::milliseconds(1));
+	ic.read(333 + regOffset);
+	std::this_thread::sleep_for(std::chrono::milliseconds(1));
+	auto rval2 = ic.read(333 + regOffset);
+	std::this_thread::sleep_for(std::chrono::milliseconds(1));
+	printf("REG %d: 0x%X     REG %d: 0x%X\n\n", 255 + regOffset, rval, 333 + regOffset, rval2);
+	// sanity check
+	if (rval != rval2) {
+	  std::cout << "ERROR: clock enable GBTx register mismatch (" << rval << " " << rval2 << ") (LINK " << fec_idx << " S" << (fec_idx%6) + 1 << " J" << ds_idx/5 + 1 << " DS" << (ds_idx%5) << ")" << std::endl << std::endl;
+	}
+	
+	int bitIdx = ds_idx % 8;
+	// clear the bit corresponding to this board
+	rval &= ~(1UL << bitIdx);
+	printf("New REG %d: 0x%X\n\n", 255 + regOffset, rval);
+	
+	// set all clock and input enable registers to the new value
+	ic.write(255 + regOffset, rval);
+	std::this_thread::sleep_for(std::chrono::milliseconds(1));
+	ic.write(333 + regOffset, rval);
+	std::this_thread::sleep_for(std::chrono::milliseconds(1));
+	ic.write(348 + regOffset, rval);
+	std::this_thread::sleep_for(std::chrono::milliseconds(1));
+	
+	ic.write(81 + regOffset2, rval);
+	std::this_thread::sleep_for(std::chrono::milliseconds(1));
+	ic.write(82 + regOffset2, rval);
+	std::this_thread::sleep_for(std::chrono::milliseconds(1));
+	ic.write(83 + regOffset2, rval);
+	std::this_thread::sleep_for(std::chrono::milliseconds(1));
       }
     }
     //delete hdlc_core;
