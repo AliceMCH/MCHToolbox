@@ -24,6 +24,8 @@ int n10bitwords[40] = {0};
 uint32_t hhvalue,hlvalue,lhvalue,llvalue;
 int nFrames = 0;
 
+bool checkBXCNT = false;
+
 struct ULDataWord_v0
 {
   union {
@@ -405,7 +407,7 @@ decode_state_t Add10BitsOfData(uint64_t data, DualSampa& dsr, DualSampaGroup* ds
 	  int link = dsr.id / 5;
 	  if( gPrintLevel >= 1 ) printf("SAMPA [%2d]: BX counter for link %d is %d\n", dsr.id, link, dsg->bxc);
 	  if( true && dsg && dsg->bxc >= 0 ) {
-	    if( !BXCNT_compare(dsg->bxc, dsr.header.fBunchCrossingCounter) ) {
+	    if( checkBXCNT && !BXCNT_compare(dsg->bxc, dsr.header.fBunchCrossingCounter) ) {
 	      printf("===> ERROR SAMPA [L %02d, DS %02d (J%1d,%1d), B %3d]: ChipAdd %d ChAdd %2d BX %d, expected %d, diff %d\n",
 		     dsr.lid,dsr.id,dsr.id/5+1,dsr.id%5,(dsr.lid*40+dsr.id), dsr.header.fChipAddress,dsr.header.fChannelAddress,
 		     dsr.header.fBunchCrossingCounter, dsg->bxc,
@@ -597,6 +599,9 @@ int main(int argc, char** argv)
       i++;
       target_cru_id=atoi(argv[i]);
       break;
+    case 'x' :
+      checkBXCNT = true;
+      break;
     }
   }
 
@@ -646,7 +651,7 @@ int main(int argc, char** argv)
   void* out_buf = NULL;
   uint32_t out_buf_size = 0;
   int BLOCK_SIZE = 8128;
-  int hb_orbit = -1;
+  int hb_orbit[2] = {-1, -1};
   int n = 0;
   int nskip = gSkip; //207;
   int iskip = 0;
@@ -748,19 +753,20 @@ int main(int argc, char** argv)
     //continue;
 
     int cru_id = ((int)CRUh.cru_id) & 0xFF;
+    int endPointID = (int)rdh.endPointID;
     if(cru_id != target_cru_id) continue;
     cru_id = 0;
 
     int cru_lid = CRUh.link_id;
     bool orbit_jump = true;
-    int Dorbit1 = CRUh.hb_orbit - hb_orbit;
-    int Dorbit2 = (uint32_t)( ((uint64_t)CRUh.hb_orbit) + 0x100000000 - hb_orbit );
+    int Dorbit1 = CRUh.hb_orbit - hb_orbit[endPointID];
+    int Dorbit2 = (uint32_t)( ((uint64_t)CRUh.hb_orbit) + 0x100000000 - hb_orbit[endPointID] );
     if( Dorbit1 >=0 && Dorbit1 <= 1 ) orbit_jump = false;
     if( Dorbit2 >=0 && Dorbit2 <= 1 ) orbit_jump = false;
     if( orbit_jump ) {
-      //printf("Resetting decoding FSM\n");
+      if (gPrintLevel >= 1) printf("Resetting decoding FSM for end-point %d\n", endPointID);
       for(int c = 0; c < NCRU; c++) {
-        for(int l = 0; l < 24; l++) {
+        for(int l = endPointID*12; l < (endPointID*12 + 12); l++) {
           for(int i = 0; i < 40; i++) {
             DualSampaReset( &(ds[c][l][i]) );
             ds[c][l][i].id = i;
@@ -775,7 +781,7 @@ int main(int argc, char** argv)
         }
       }
     }
-    hb_orbit = CRUh.hb_orbit;
+    hb_orbit[endPointID] = CRUh.hb_orbit;
 
     for(int i = 0; i < 40; i++) {
       out_word[i] = 0;
