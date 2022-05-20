@@ -44,14 +44,73 @@ struct DsConfig
 };
 
 
+void enableDsBoards(int fec_idx, std::string pci_addr_str1, std::string pci_addr_str2, uint8_t* enablePatt)
+{
+  o2::alf::roc::PciAddress pci_addr1(pci_addr_str1);
+  o2::alf::roc::PciAddress pci_addr2(pci_addr_str2);
+  o2::alf::roc::Parameters::CardIdType cardId1 = pci_addr1;
+  o2::alf::roc::Parameters::CardIdType cardId2 = pci_addr2;
+
+  try {
+#ifdef BUILD_FOR_ALF
+    gCardIdMutex.lock();
+    o2::alf::roc::Parameters::CardIdType& cardId = (fec_idx < 12) ? cardId1 : cardId2;
+    int linkId = fec_idx % 12;
+    o2::alf::Ic ic(cardId, linkId);
+    gCardIdMutex.unlock();
+#else
+#endif
+
+    for (int i = 0; i < 5; i++) {
+      uint16_t patt = enablePatt[i];
+      int regClk1 = 255 + (i * 3);
+      int regClk2 = 333 + (i * 3);
+      int regClk3 = 348 + (i * 3);
+
+      std::cout << "Writing " << patt << " into " << regClk1 << std::endl;
+      ic.write(regClk1, patt);
+      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      std::cout << "Writing " << patt << " into " << regClk2 << std::endl;
+      ic.write(regClk2, patt);
+      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      std::cout << "Writing " << patt << " into " << regClk3 << std::endl;
+      ic.write(regClk3, patt);
+      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
+      
+      int regIn1 = 81 + (i * 24);
+      int regIn2 = 82 + (i * 24);
+      int regIn3 = 83 + (i * 24);
+
+      std::cout << "Writing " << patt << " into " << regIn1 << std::endl;
+      ic.write(regIn1, patt);
+      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      std::cout << "Writing " << patt << " into " << regIn2 << std::endl;
+      ic.write(regIn2, patt);
+      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      std::cout << "Writing " << patt << " into " << regIn3 << std::endl;
+      ic.write(regIn3, patt);
+      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+  }
+  catch (std::runtime_error& e) {
+    std::cerr << e.what() << std::endl;
+  }
+}
+
+
 void fecConfig(int fec_idx, std::string pci_addr_str1, std::string pci_addr_str2, std::vector<DsConfig>* dsConfigVec)
 {
   o2::alf::roc::PciAddress pci_addr1(pci_addr_str1);
   o2::alf::roc::PciAddress pci_addr2(pci_addr_str2);
   o2::alf::roc::Parameters::CardIdType cardId1 = pci_addr1;
   o2::alf::roc::Parameters::CardIdType cardId2 = pci_addr2;
-  //return;
-  if (dsConfigVec->empty()) { return; }
+
+  uint8_t enablePatt[5] = {0, 0, 0, 0, 0};
+
+  if (dsConfigVec->empty()) {
+    return;
+  }
   try {
 #ifdef BUILD_FOR_ALF
     gCardIdMutex.lock();
@@ -60,8 +119,6 @@ void fecConfig(int fec_idx, std::string pci_addr_str1, std::string pci_addr_str2
     int linkId = fec_idx % 12;
     std::unique_ptr<cru::HdlcAlf> hdlc_core(new cru::HdlcAlf(cardId, linkId, true));
     //cru::HdlcAlf* hdlc_core = new cru::HdlcAlf(cardId, fec_idx, true);
-
-    o2::alf::Ic ic(cardId, linkId);
     gCardIdMutex.unlock();
 #else
     std::unique_ptr<common::Bar> bar;
@@ -121,48 +178,11 @@ void fecConfig(int fec_idx, std::string pci_addr_str1, std::string pci_addr_str2
         //std::cout<<"SAMPA "<< fec_idx << ":" << ds_idx*2+1<<" succesfully configured\n";
       }
 
-      if (!dsOK) {
-	  std::cout << "Disabling DS board (LINK " << fec_idx << " S" << (fec_idx%6) + 1 << " J" << ds_idx/5 + 1 << " DS" << (ds_idx%5) << ")" << std::endl << std::endl;
-	// disable the corresponding e-Link
-	// offset between clock enable registers
-	int regOffset = (ds_idx / 8 ) * 3;
-	// offset between input enable registers
-	int regOffset2 = (ds_idx / 8 ) * 24;
-	
-	// read the bit pattern
-	ic.read(255 + regOffset);
-	std::this_thread::sleep_for(std::chrono::milliseconds(1));
-	auto rval = ic.read(255 + regOffset);
-	std::this_thread::sleep_for(std::chrono::milliseconds(1));
-	ic.read(333 + regOffset);
-	std::this_thread::sleep_for(std::chrono::milliseconds(1));
-	auto rval2 = ic.read(333 + regOffset);
-	std::this_thread::sleep_for(std::chrono::milliseconds(1));
-	printf("REG %d: 0x%X     REG %d: 0x%X\n\n", 255 + regOffset, rval, 333 + regOffset, rval2);
-	// sanity check
-	if (rval != rval2) {
-	  std::cout << "ERROR: clock enable GBTx register mismatch (" << rval << " " << rval2 << ") (LINK " << fec_idx << " S" << (fec_idx%6) + 1 << " J" << ds_idx/5 + 1 << " DS" << (ds_idx%5) << ")" << std::endl << std::endl;
-	}
-	
-	int bitIdx = ds_idx % 8;
-	// clear the bit corresponding to this board
-	rval &= ~(1UL << bitIdx);
-	printf("New REG %d: 0x%X\n\n", 255 + regOffset, rval);
-	
-	// set all clock and input enable registers to the new value
-	ic.write(255 + regOffset, rval);
-	std::this_thread::sleep_for(std::chrono::milliseconds(1));
-	ic.write(333 + regOffset, rval);
-	std::this_thread::sleep_for(std::chrono::milliseconds(1));
-	ic.write(348 + regOffset, rval);
-	std::this_thread::sleep_for(std::chrono::milliseconds(1));
-	
-	ic.write(81 + regOffset2, rval);
-	std::this_thread::sleep_for(std::chrono::milliseconds(1));
-	ic.write(82 + regOffset2, rval);
-	std::this_thread::sleep_for(std::chrono::milliseconds(1));
-	ic.write(83 + regOffset2, rval);
-	std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      if (dsOK) {
+	// enable the DS board in the bit pattern
+	int regId = ds_idx / 8;
+	int bitId = ds_idx % 8;
+	enablePatt[regId] |= 1UL << bitId;
       }
     }
     //delete hdlc_core;
@@ -173,7 +193,8 @@ void fecConfig(int fec_idx, std::string pci_addr_str1, std::string pci_addr_str2
     success = false;
     //exit(100);
   }
-
+  
+  enableDsBoards(fec_idx, pci_addr_str1, pci_addr_str2, enablePatt);
 }
 
 
