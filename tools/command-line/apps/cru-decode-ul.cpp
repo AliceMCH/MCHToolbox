@@ -666,12 +666,12 @@ int main(int argc, char** argv)
     //printf("skipped: %llX\n", temp);
     }*/
 
+  RAWDataHeaderV6 rdh;
   while(true) {
 
     if (end > 0 && nFrames > end) break;
 
     int n64bitWords = 0;
-    RAWDataHeaderV6 rdh;
     if( read_header ) {
       n64bitWords = 0;
       int nread = read( fin, CRUbuf, sizeof(CRUbuf) );
