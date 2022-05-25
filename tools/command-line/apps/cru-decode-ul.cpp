@@ -684,7 +684,23 @@ int main(int argc, char** argv)
       CRUh.block_length = CRUh.memory_size - CRUh.header_size;
       BLOCK_SIZE = CRUh.block_length;
       int cru_id = ((int)CRUh.cru_id) & 0xFF;
-      if( (nFrames%1000000 == 0) || false ||
+
+      if( CRUh.header_version < 4 || CRUh.header_version > 6 || CRUh.header_size != 64 ) {
+	printf("ERROR: bad RDH received\n");
+	break;
+      }
+
+      bool rdhError = false;
+      if ((rdh.stopBit != 0) && (rdh.bunchCrossing != 3563)) {
+	printf("ERROR: inconsisted RDH stop bit\n");
+	rdhError == true;
+      }
+      if ((rdh.stopBit == 0) && (rdh.bunchCrossing == 3563)) {
+	printf("ERROR: stop bit missing\n");
+	rdhError == true;
+      }
+
+      if( (nFrames%1000000 == 0) || false || rdhError ||
           (nFrames > nskip && gPrintLevel >= 1 /*&& cru_id == target_cru_id*/ /*&& CRUh.block_length > 0*/) ) {
 	//printf("nFrames=%d  skip=%d  end=%d\n", nFrames, nskip, end);
 	printf("%6d:  version %X  memsz %4d  offset %4d  packet %3d  srcID %d  cruID %2d  dp %d  feeID %04X  link %2d  orbit %u  bc %4d  trig 0x%08X  page %d  stop %d  UL version %X\n",
@@ -696,7 +712,7 @@ int main(int argc, char** argv)
 	  printf("HBF size: %d\nPayload size: %d\nN. of 256-bit words: %f\n",
 		 (int)CRUh.memory_size, (int)CRUh.block_length, ((float)CRUh.block_length) / 256);
       }
-      if( CRUh.header_version < 4 || CRUh.header_version > 6 || CRUh.header_size != 64 ) break;
+
       read_header = false;
 
       if ((int)rdh.cruID & 0x100) {
