@@ -21,9 +21,10 @@ fi
 
 if [ x"$RUNTYPE" = "xpedestals_ul" ]; then
     PATT1=${PATT_IDLE}
-    PATT2=${PATT_SYNC}
+    #PATT2=${PATT_SYNC}
     #PATT2=${PATT_PHYS}
     #PATT2=${PATT_PHYS_SYNC}
+    PATT2=${PATT_HBTR}
     #PATT2=${PATT_PHYS_HBTR_SYNC}
     PATT3=${PATT_SYNC}
     echo "roc-pat-player --id=${CRU_PCI_ADDR} --idle=${PATT1} --sync=${PATT2} --reset=${PATT3} --sync-length=1 --sync-delay=0 --sync-trigger-select=11 --reset-trigger-select=12"
