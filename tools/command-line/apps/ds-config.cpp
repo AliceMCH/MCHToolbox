@@ -20,7 +20,7 @@
 
 #define BUILD_FOR_CRU 1
 #define BUILD_FOR_ALF 1
-//#define PARALLEL 1
+#define PARALLEL 1
 
 #include "../src/Sca/cern/hdlc_cern_me.hpp"
 #include "../src/Sca/hdlc_alf.hpp"
@@ -67,13 +67,13 @@ void enableDsBoards(int fec_idx, std::string pci_addr_str1, std::string pci_addr
       int regClk2 = 333 + (i * 3);
       int regClk3 = 348 + (i * 3);
 
-      std::cout << "Writing " << patt << " into " << regClk1 << std::endl;
+      //std::cout << "Writing " << patt << " into " << regClk1 << std::endl;
       ic.write(regClk1, patt);
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
-      std::cout << "Writing " << patt << " into " << regClk2 << std::endl;
+      //std::cout << "Writing " << patt << " into " << regClk2 << std::endl;
       ic.write(regClk2, patt);
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
-      std::cout << "Writing " << patt << " into " << regClk3 << std::endl;
+      //std::cout << "Writing " << patt << " into " << regClk3 << std::endl;
       ic.write(regClk3, patt);
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
@@ -82,13 +82,13 @@ void enableDsBoards(int fec_idx, std::string pci_addr_str1, std::string pci_addr
       int regIn2 = 82 + (i * 24);
       int regIn3 = 83 + (i * 24);
 
-      std::cout << "Writing " << patt << " into " << regIn1 << std::endl;
+      //std::cout << "Writing " << patt << " into " << regIn1 << std::endl;
       ic.write(regIn1, patt);
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
-      std::cout << "Writing " << patt << " into " << regIn2 << std::endl;
+      //std::cout << "Writing " << patt << " into " << regIn2 << std::endl;
       ic.write(regIn2, patt);
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
-      std::cout << "Writing " << patt << " into " << regIn3 << std::endl;
+      //std::cout << "Writing " << patt << " into " << regIn3 << std::endl;
       ic.write(regIn3, patt);
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
