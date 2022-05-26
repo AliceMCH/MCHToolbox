@@ -59,7 +59,7 @@ class HdlcAlf : public common::HdlcCore
      */
     void rst() final override
     {
-      //sendSvlReset();
+      sendSvlReset();
       sca.scReset();
       //std::this_thread::sleep_for(std::chrono::milliseconds(100));
       //sendSvlConnect();
