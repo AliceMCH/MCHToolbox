@@ -121,8 +121,8 @@ for I in $(seq 1 1); do
 	#exit 0
 	echo "SAMPA configuration failed, retrying ($I)"; sleep 1
 	#cat sampa_load.log | grep "ERROR" | grep "Configuration" | grep "failed"
-        cat sampa_load_${CRU}.log | grep "FAILED"
         cat sampa_load_${CRU}.log | grep "timeout"
+        cat sampa_load_${CRU}.log | grep "FAILED"
 	echo ""; echo "Configuration of $NENABLED sampa boards finished with errors"
 	ERROR=1
     fi
