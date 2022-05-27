@@ -194,7 +194,7 @@ void fecConfig(int fec_idx, std::string pci_addr_str1, std::string pci_addr_str2
     //exit(100);
   }
   
-  enableDsBoards(fec_idx, pci_addr_str1, pci_addr_str2, enablePatt);
+  //enableDsBoards(fec_idx, pci_addr_str1, pci_addr_str2, enablePatt);
 }
 
 

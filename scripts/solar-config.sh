@@ -71,8 +71,8 @@ for reg in 255 333 348; do
 	P=$(echo -n "$PATT" | tail -c $(($iter*8)) | head -c 8)
 	INPATTREG=$(echo "ibase=2; $P" | bc)
 	#../GBT_IC/build/gbt-ic ${CRU_PCI_ADDR} "w" ${LINKID} $reg 255
-	#echo "${LINKID} $reg $INPATTREG" >> "$REGFILE"
-	echo "${LINKID} $reg 255" >> "$REGFILE"
+	echo "${LINKID} $reg $INPATTREG" >> "$REGFILE"
+	#echo "${LINKID} $reg 255" >> "$REGFILE"
 	reg=$((reg+3))
     done
 done
@@ -87,8 +87,8 @@ for reg in 81 82 83; do
 	#echo "I $iter  P: $P"
 	#echo "INPATTREG: $INPATTREG"
 	#../GBT_IC/build/gbt-ic ${CRU_PCI_ADDR} "w" ${LINKID} $reg 255
-	#echo "${LINKID} $reg $INPATTREG" >> "$REGFILE"
-	echo "${LINKID} $reg 255" >> "$REGFILE"
+	echo "${LINKID} $reg $INPATTREG" >> "$REGFILE"
+	#echo "${LINKID} $reg 255" >> "$REGFILE"
 	#echo "$reg $INPATTREG"
 	reg=$((reg+24))
     done
