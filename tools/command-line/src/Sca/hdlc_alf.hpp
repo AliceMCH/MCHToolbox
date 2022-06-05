@@ -60,10 +60,11 @@ class HdlcAlf : public common::HdlcCore
     void rst() final override
     {
       sendSvlReset();
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
       sca.scReset();
-      //std::this_thread::sleep_for(std::chrono::milliseconds(100));
-      //sendSvlConnect();
-      //std::this_thread::sleep_for(std::chrono::milliseconds(100));
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+      sendSvlConnect();
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
       //sca.waitOnBusyClear();
     }
 
