@@ -691,17 +691,19 @@ int main(int argc, char** argv)
       }
 
       bool rdhError = false;
-      if ((rdh.stopBit != 0) && (rdh.bunchCrossing != 3563)) {
-	printf("ERROR: inconsisted RDH stop bit\n");
-	rdhError == true;
-      }
-      if ((rdh.stopBit == 0) && (rdh.bunchCrossing == 3563)) {
-	printf("ERROR: stop bit missing\n");
-	rdhError == true;
+      if (cru_id == target_cru_id) {
+	if ((rdh.stopBit != 0) && (rdh.bunchCrossing != 3563)) {
+	  printf("ERROR: inconsisted RDH stop bit\n");
+	  rdhError = true;
+	}
+	if ((rdh.stopBit == 0) && (rdh.bunchCrossing == 3563)) {
+	  printf("ERROR: stop bit missing\n");
+	  rdhError = true;
+	}
       }
 
       if( (nFrames%1000000 == 0) || false || rdhError ||
-          (nFrames > nskip && gPrintLevel >= 1 /*&& cru_id == target_cru_id*/ /*&& CRUh.block_length > 0*/) ) {
+          (nFrames > nskip && gPrintLevel >= 1 && cru_id == target_cru_id /*&& CRUh.block_length > 0*/) ) {
 	//printf("nFrames=%d  skip=%d  end=%d\n", nFrames, nskip, end);
 	printf("%6d:  version %X  memsz %4d  offset %4d  packet %3d  srcID %d  cruID %2d  dp %d  feeID %04X  link %2d  orbit %u  bc %4d  trig 0x%08X  page %d  stop %d  UL version %X\n",
 	       nFrames, (int)rdh.version, (int)rdh.memorySize, (int)rdh.offsetToNext,
