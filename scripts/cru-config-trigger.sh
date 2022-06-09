@@ -7,7 +7,7 @@ source ${SCRIPTDIR}/env-${CRU}.sh
 
 echo "Configuring trigger for CRU $CRU"
 
-if [ x"$RUNTYPE" = "xpedestals" -o x"$RUNTYPE" = "xpedestals_ul" ]; then
+if [ x"$RUNTYPE" = "xpedestals" ]; then
     PATT1=${PATT_IDLE}
     PATT2=${PATT_PHYS}
     PATT3=${PATT_SYNC}
@@ -22,8 +22,8 @@ fi
 if [ x"$RUNTYPE" = "xpedestals_ul" ]; then
     PATT1=${PATT_IDLE}
     #PATT2=${PATT_SYNC}
-    #PATT2=${PATT_PHYS}
-    PATT2=${PATT_PHYS_SYNC}
+    PATT2=${PATT_PHYS}
+    #PATT2=${PATT_PHYS_SYNC}
     #PATT2=${PATT_HBTR}
     #PATT2=${PATT_PHYS_HBTR_SYNC}
     PATT3=${PATT_SYNC}
