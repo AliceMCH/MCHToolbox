@@ -406,6 +406,122 @@ DsFec::sampaConfigure(std::string filename, int16_t sampa_id, uint8_t nRetry, bo
 
 
 bool
+DsFec::sampaCheckConfiguration(std::string filename, int16_t sampa_id, uint8_t nRetry, std::ostream* const os) const
+{
+  const gbt::ScaI2c& sampa(*i2c_sampa_[sampa_id]);
+  gbt::ScaI2c* psampa = i2c_sampa_[sampa_id].get();
+  Sampa& sampa2 = getSampa(sampa_id);
+
+  std::ifstream infile(filename);
+  if( !infile ) {
+    if(os) *os <<"Input file "<<filename<<" not correctly opened\n";
+    return false;
+  }
+ 
+  std::string line;
+  bool failed = false;
+  std::map<int, int> registers;
+  while (std::getline(infile, line)) {
+    //if(os) *os <<"Line: \""<<line<<"\"\n";
+    if(line.empty()) continue;
+    if(line[0] == '#') continue;
+    std::istringstream iss(line);
+    std::string a, b, c="-1";
+    //if (!(iss >> a >> b)) { continue; } // error
+    //if(os) *os <<"a: \""<<a<<"\"    b:\""<<b<<"\""<<std::endl;
+    int32_t ia; // = convertSampaRegister(a,os);
+    int32_t ib; // = convertSampaRegister(b,os);
+    int32_t ic; // = convertSampaRegister(c,os);
+    //if(os) *os<<"  ia: 0x"<<std::hex<<ia<<" ("<<std::dec<<ia<<")  ib: 0x"<<std::hex<<ib<<" ("<<std::dec<<ib<<")\n";
+    sscanf(line.c_str(), "%i %i %i", &ic, &ia, &ib);
+    if(ia < 0 || ib < 0) return false;
+    // do not read software reset register
+    if (ia == 0x0E) continue;
+
+    // skip channel registers for the moment, only check basic configuration
+    if (ic >= 0) continue;
+
+    int key = 0;
+    if (ic < 0) key = -1 * ia;
+    else key = ia * 32 + ic;
+
+    auto iter = registers.find(key);
+    if (iter != registers.end()) {
+      iter->second = ib;
+    } else {
+      registers.insert(std::make_pair(key, (int)ib));
+    }
+  }
+
+  for (auto reg : registers) {
+
+    int32_t ic;
+    int32_t ia;
+    int32_t ib = reg.second;
+   
+    if (reg.first < 0) {
+      ia = -1 * reg.first;
+      ic = -1;
+    } else {
+      ia = reg.first / 32;
+      ic = reg.first % 32;
+    }
+
+    sampa2.set_readback(false);
+    sampa2.set_nretries(nRetry);
+
+    // read register from SAMPA
+    bool read_failed = true;
+    try {
+      if (false && os) {
+        *os << "  Reading SAMPA register: SAMPA " << static_cast<uint32_t>(sampa_id)
+	        << " [I2C addr " << sampa.getSlaveAddress()
+	        << ", SCA CH" << static_cast<uint32_t>(sampa.getChannel()) <<"], [reg 0x"
+	        << std::hex << ia << ", expected value 0x" << ib << std::dec << "]\n";
+      }
+      bool readOk;
+      uint8_t val8;
+      uint16_t val16;
+      for (int retry = 0; retry <= nRetry; retry++) {
+	if( ic < 0 ) {
+	  readOk = sampa_[sampa_id]->readRegister(ia, val8);
+	} else {
+	  readOk = sampa_[sampa_id]->readChannelRegister(ic, ia, val16);
+	}
+	if (readOk) break;
+      }
+      if( !readOk ) { read_failed = true; failed = true; break; }
+    
+      if( ic < 0 ) {
+	if (ib != val8) {
+	  *os << "Error reading register 0x" << std::hex << ia << ", got 0x" << (int)val8 << " expected 0x" << ib << std::dec << std::endl;
+	  readOk = false;
+	}
+      } else {
+	if (ib != val16) {
+	  *os << "Error reading channel register " << ic << ",0x" << std::hex << ia << ", got 0x" << (int)val16 << " expected 0x" << ib << std::dec << std::endl;
+	  readOk = false;
+	}
+      }
+
+      if( readOk ) { read_failed = false; continue; }
+    }
+    catch(gbt::ScaException& e) {
+      /* Ignore these here */ 
+      if(os) {
+        *os << e.what();
+      }
+    }
+
+    if( read_failed ) { failed = true; }
+    //break;
+  }
+  //if( os ) sampa2.dumpRegisters(*os);
+  return( !failed );
+}
+
+
+bool
 DsFec::sampaDumpConfiguration(std::string filename, std::string dumpFileName, int16_t sampa_id, uint8_t nRetry, std::ostream* const os) const
 {
   const gbt::ScaI2c& sampa(*i2c_sampa_[sampa_id]);

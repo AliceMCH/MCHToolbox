@@ -84,7 +84,7 @@ class Sampa
       try {
         ret = i2c_.readByte(static_cast<uint32_t>(addr));
       } catch( const gbt::ScaException& e ) {
-        std::cerr<<"Sampa::readRegister("<<addr<<") failed, reason: "<<e.what()<<std::endl;
+        std::cerr<<"Sampa::readRegister("<<(int)addr<<") failed, reason: "<<e.what()<<std::endl;
         ok = false;
       }
       return ok;
