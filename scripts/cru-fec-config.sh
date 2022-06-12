@@ -16,8 +16,11 @@ while [ true ]; do
     echo ""; echo "";
     RED='\033[0;31m'
     NC='\033[0m' # No Color
-    echo -n -e "${RED}Too many DS boards with errors, please check and press enter when ready...${NC}"
+    echo -n -e "${RED}Too many DS boards with errors, retry? [y/n]${NC}"
     read dummy
+    if [ x"$dummy" = "xn" ]; then
+	break
+    fi
 done
 
 ./cru-ul-reset.sh $CRU
