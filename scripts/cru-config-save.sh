@@ -6,7 +6,8 @@ if [ cru.map -nt env-${CRU}.sh ]; then ./cru-init-env.sh $CRU; fi
 
 source env-${CRU}.sh
 
-PREFIX="cru-${RUNTYPE}-${CRU_SN}"
+#PREFIX="cru-${RUNTYPE}-${CRU_SN}"
+PREFIX="cru-${CRU_SN}"
 
 CRUCONF=$(./cru-config-gen.sh $CRU)
 CRUCONF1=$(echo "$CRUCONF" | sed -n 1p)
