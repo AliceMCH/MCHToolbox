@@ -92,13 +92,19 @@ uint32_t Ic::read(uint32_t address)
   barWrite(sc_regs::IC_WR_CMD.index, 0x1);
   barWrite(sc_regs::IC_WR_CMD.index, 0x0);
 
+  std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
   // Execute the RD State Machine
   barWrite(sc_regs::IC_WR_CMD.index, 0x8);
   barWrite(sc_regs::IC_WR_CMD.index, 0x0);
 
+  std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
   // Pulse the READ
   barWrite(sc_regs::IC_WR_CMD.index, 0x2);
   barWrite(sc_regs::IC_WR_CMD.index, 0x0);
+
+  std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
   // Read the status of the FIFO
   uint32_t ret = barRead(sc_regs::IC_RD_DATA.index);
@@ -124,6 +130,8 @@ uint32_t Ic::write(uint32_t address, uint32_t data)
   barWrite(sc_regs::IC_WR_DATA.index, data);
   barWrite(sc_regs::IC_WR_CMD.index, 0x1);
   barWrite(sc_regs::IC_WR_CMD.index, 0x0);
+
+  std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
   // Execute the WR State Machine
   barWrite(sc_regs::IC_WR_CMD.index, 0x4);
