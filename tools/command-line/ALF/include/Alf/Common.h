@@ -33,7 +33,7 @@ namespace roc = AliceO2::roc;
 static constexpr int kCruNumLinks(12);
 static constexpr int kCrorcNumLinks(6);
 
-static constexpr auto BUSY_TIMEOUT = std::chrono::milliseconds(100);
+static constexpr auto BUSY_TIMEOUT = std::chrono::milliseconds(10);
 static constexpr auto CHANNEL_BUSY_TIMEOUT = std::chrono::milliseconds(10);
 
 struct AlfLink {

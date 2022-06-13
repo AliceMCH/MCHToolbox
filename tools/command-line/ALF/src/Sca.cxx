@@ -78,7 +78,6 @@ void Sca::svlConnect()
 
 Sca::CommandData Sca::executeCommand(uint32_t command, uint32_t data, bool lock)
 {
-  //std::unique_lock<std::mutex> scaLock(scaMutex);
   if (lock) {
     mLlaSession->start();
   }
@@ -99,7 +98,6 @@ Sca::CommandData Sca::executeCommand(uint32_t command, uint32_t data, bool lock)
   if (lock) {
     mLlaSession->stop();
   }
-  //scaLock.unlock();
 
   return result;
 }
@@ -205,20 +203,18 @@ void Sca::execute()
 {
   barWrite(sc_regs::SCA_WR_CTRL.index, 0x4);
   barWrite(sc_regs::SCA_WR_CTRL.index, 0x0);
-  //waitOnBusyClear();
+  waitOnBusyClear();
 }
 
 void Sca::waitOnBusyClear()
 {
-  auto endTime = std::chrono::steady_clock::now() + BUSY_TIMEOUT;
-  int nloop = 0;
-  while (std::chrono::steady_clock::now() < endTime) {
-    nloop += 1;
+  int count = 10;
+  auto sleepSlice = BUSY_TIMEOUT / count;
+  while (count--) {
     if ((((barRead(sc_regs::SCA_RD_CTRL.index)) >> 31) & 0x1) == 0) {
       return;
     }
-    usleep(1000);
-    //std::this_thread::sleep_for(std::chrono::milliseconds(waitTime));
+    std::this_thread::sleep_for(sleepSlice);
   }
 
   char message[500];

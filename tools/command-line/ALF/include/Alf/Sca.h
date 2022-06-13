@@ -22,7 +22,6 @@
 #include <string>
 #include <map>
 #include <boost/variant.hpp>
-#include <mutex>
 
 #include "ReadoutCard/BarInterface.h"
 #include "ReadoutCard/Parameters.h"
@@ -37,8 +36,6 @@ namespace o2
 {
 namespace alf
 {
-
-static std::mutex scaMutex;
 
 /// Class for interfacing with the C-RORC's(?) and CRU's Slow-Control Adapter (SCA)
 class Sca : public ScBase
