@@ -9,19 +9,15 @@ while [ true ]; do
     ./cru-solar-config.sh $CRU && sleep 5 && ./cru-ds-config.sh $CRU
 
     NFAILED=$(cat sampa_load_${CRU}.log | grep "FAILED" | wc -l)
-    if [ $NFAILED -lt 11 ]; then
-	break
-    fi
-
     NTIMEOUTS=$(cat sampa_load_${CRU}.log | grep "timeout" | wc -l)
-    if [ $NTIMEOUTS -lt 1 ]; then
+    if [ $NFAILED -lt 11 -a $NTIMEOUTS -lt 1 ]; then
 	break
     fi
 
     echo ""; echo "";
     RED='\033[0;31m'
     NC='\033[0m' # No Color
-    echo -n -e "${RED}Too many DS boards with errors, retry? [y/n]${NC}"
+    echo -n -e "${RED}Too many DS boards with errors, retry? [Y/n]${NC}"
     read dummy
     if [ x"$dummy" = "xn" ]; then
 	break
