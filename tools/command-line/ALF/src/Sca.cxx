@@ -218,7 +218,7 @@ void Sca::waitOnBusyClear()
   }
 
   char message[500];
-  sprintf(message, "Exceeded timeout on busy wait %d", nloop);
+  sprintf(message, "Exceeded timeout on busy wait");
   BOOST_THROW_EXCEPTION(ScaException()
                         << ErrorInfo::Message(message));
 }
