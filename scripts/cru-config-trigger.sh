@@ -33,7 +33,7 @@ if [ x"$RUNTYPE" = "xpedestals_ul" ]; then
     roc-pat-player --id=${CRU_PCI_ADDR} --idle=${PATT1} \
 	--sync=${PATT2} \
         --reset=${PATT3} \
-	--sync-length=1 --sync-delay=64 --sync-trigger-select=11 --reset-trigger-select=11
+	--sync-length=1 --sync-delay=0 --sync-trigger-select=11 --reset-trigger-select=12
     exit
 fi
 
