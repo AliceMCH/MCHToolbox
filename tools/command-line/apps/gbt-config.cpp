@@ -140,7 +140,7 @@ int main(int argc, char** argv)
     //auto ic = Ic(card, linkid);
     try {
       uint32_t rval = ic.read(reg);
-      printf("r reg %d: 0x%02X (%d)\n", reg, rval, rval);
+      printf("%d 0x%02X %d\n", reg, rval, rval);
     } catch (const IcException& e) {
       std::cerr << e.what() << std::endl;
       llaSession->stop();

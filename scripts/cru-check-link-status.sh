@@ -45,4 +45,56 @@ for DW in 0 1; do
     fi
 done
 
+echo ""; echo "";
+
+GBTCMD=../tools/command-line/build/gbt-config
+
+echo "CRU $1 read/write status: "
+NLINKS=$(echo "${CRU_LINKS1}" | tr "," "\n" | wc -l)
+OK=1
+for L in $(seq 1 $NLINKS); do
+
+    LINK=$(echo "${CRU_LINKS1}" | tr "," "\n" | sed -n ${L}p)
+    #echo "LINK: $LINK"
+    if [ -z "$LINK" ]; then continue; fi
+
+    for VAL in 170 0; do
+	#echo "Writing $VAL into register 81 of ${CRU}/${CRU_PCI_ADDR}/${LINK}"
+	#echo "$GBTCMD ${CRU_PCI_ADDR1} ${CRU_PCI_ADDR2} \"w\" ${LINK} 81 170"
+	STATUS=$($GBTCMD ${CRU_PCI_ADDR1} ${CRU_PCI_ADDR2} "w" ${LINK} 81 $VAL)
+	RET=$?
+	if [ $RET != 0 ]; then
+	    OK=0
+	    RESULT=1
+	    echo ""
+	    echo "$STATUS"
+	    ./cru-describe-link.sh $CRU $LINK
+	    break;
+	fi
+
+	#echo "Reading register 81 from ${CRU}/${CRU_PCI_ADDR}/${LINK}"
+	#echo "$GBTCMD ${CRU_PCI_ADDR1} ${CRU_PCI_ADDR2} \"r\" ${LINK} 81"
+	READ=$($GBTCMD ${CRU_PCI_ADDR1} ${CRU_PCI_ADDR2} "r" ${LINK} 81 | cut -d ' ' -f 3)
+	if [ x"$READ" != x"$VAL" ]; then
+	    OK=0
+	    RESULT=1
+	    echo ""
+	    echo "Expected $VAL, got $READ"
+	    ./cru-describe-link.sh $CRU $LINK
+	    break;
+	fi
+    done
+
+    if [ $OK -eq 1 ]; then
+	echo "Link $LINK OK"
+    fi
+
+done
+
+if [ $OK -eq 0 ]; then
+    echo "Some links are not responding"
+else
+    echo "OK"
+fi
+
 exit $RESULT
