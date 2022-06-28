@@ -112,8 +112,8 @@ uint32_t Ic::read(uint32_t address)
   barWrite(sc_regs::IC_WR_CMD.index, 0x8);
   barWrite(sc_regs::IC_WR_CMD.index, 0x0);
 
-  //std::this_thread::sleep_for(std::chrono::milliseconds(10));
-  waitForDataReady();
+  std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  //waitForDataReady();
 
   // Pulse the READ
   barWrite(sc_regs::IC_WR_CMD.index, 0x2);
