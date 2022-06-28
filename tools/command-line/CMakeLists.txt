@@ -16,7 +16,9 @@ project(GBT_IC
   VERSION 0.0.1
   DESCRIPTION "O2 low-level GTB-IC communication"
   LANGUAGES CXX
-)
+  )
+
+set(USE_SYSTEM_ALF FALSE)
 
 # Add compiler flags for warnings and debug symbols
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra")
@@ -47,18 +49,17 @@ find_package(Common REQUIRED)
 find_package(InfoLogger REQUIRED)
 find_package(ReadoutCard REQUIRED)
 find_package(LLA REQUIRED)
-#find_package(ALF REQUIRED)
-
+if(USE_SYSTEM_ALF)
+  find_package(ALF REQUIRED)
+else()
+  set(ALF_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/ALF/include)
+endif()
 
 ####################################
 # Executables
 ####################################
 
 set(LIB_SRCS
-  ALF/src/ScBase.cxx
-  ALF/src/Ic.cxx
-  ALF/src/Sca.cxx
-  ALF/src/Lla.cxx
   src/Sca/hdlc_core.cpp
   src/Sca/hdlc_alf.cpp
   src/Sca/cern/hdlc_cern_me.cpp
@@ -68,6 +69,15 @@ set(LIB_SRCS
   src/Sca/ds_fec.cpp
   src/decode/decode.cpp
 )
+if(NOT USE_SYSTEM_ALF)
+  list(APPEND LIB_SRCS
+    ALF/src/ScBase.cxx
+    ALF/src/Ic.cxx
+    ALF/src/Sca.cxx
+    ALF/src/Lla.cxx
+  )
+endif()
+
 
 set(EXE_SRCS
   gbt-config.cpp
@@ -82,6 +92,16 @@ set(EXE_NAMES
   cru-decode
   cru-decode-ul
 )
+
+set(EXE_LIBS
+  AliceO2::Common
+  AliceO2::InfoLogger
+  AliceO2::ReadoutCard
+  o2::LLA
+)
+if(USE_SYSTEM_ALF)
+  list(APPEND EXE_LIBS o2::ALF)
+endif()
 
 list(LENGTH EXE_SRCS count)
 math(EXPR count "${count}-1")
@@ -100,11 +120,7 @@ foreach(i RANGE ${count})
   )
   target_link_libraries(${name}
     PUBLIC
-      AliceO2::Common
-      AliceO2::InfoLogger
-      AliceO2::ReadoutCard
-      o2::LLA
-      #o2::ALF
+      ${EXE_LIBS}
   )
   # Use C++17
   target_compile_features(${name} PUBLIC cxx_std_17)
