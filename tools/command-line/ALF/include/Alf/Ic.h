@@ -125,6 +125,8 @@ class Ic : public ScBase
   ///         o2::lla::LlaException on lock fail
   std::string writeSequence(std::vector<std::pair<Operation, Data>> ops, bool lock = false);
 
+  void waitForDataReady();
+
   static std::string IcOperationToString(Operation op);
   static Ic::Operation StringToIcOperation(std::string op);
 };

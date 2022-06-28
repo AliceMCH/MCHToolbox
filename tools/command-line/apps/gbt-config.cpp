@@ -132,12 +132,11 @@ int main(int argc, char** argv)
     int linkid = atoi(argv[4]);
     int reg = atoi(argv[5]);
 
-  o2::alf::roc::Parameters::CardIdType cardId = (linkid < 12) ? cardId1 : cardId2;
-  linkid = linkid % 12;
+    o2::alf::roc::Parameters::CardIdType cardId = (linkid < 12) ? cardId1 : cardId2;
+    linkid = linkid % 12;
 
-  //std::cout << "Creating GBT IC interface for card " << cardId << "/" << linkid << std::endl;
-  auto ic = o2::alf::Ic(cardId, linkid);
-    //auto ic = Ic(card, linkid);
+    //std::cout << "Creating GBT IC interface for card " << cardId << "/" << linkid << std::endl;
+    auto ic = o2::alf::Ic(cardId, linkid);
     try {
       uint32_t rval = ic.read(reg);
       printf("%d 0x%02X %d\n", reg, rval, rval);
@@ -158,7 +157,6 @@ int main(int argc, char** argv)
 
     //std::cout << "Creating GBT IC interface for card " << cardId << "/" << linkid << std::endl;
     auto ic = o2::alf::Ic(cardId, linkid);
-    //auto ic = Ic(card, linkid);
     printf("Writing 0x%X into GBT register %d\n", val, reg);
     try {
       uint32_t rval = ic.read(reg);

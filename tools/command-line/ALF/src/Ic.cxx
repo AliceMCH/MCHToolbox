@@ -78,6 +78,20 @@ Ic::Ic(std::string cardId, int linkId)
   barWrite(sc_regs::IC_WR_CFG.index, 0x3);
 }
 
+void Ic::waitForDataReady()
+{
+  int count = 10;
+  auto sleepSlice = std::chrono::milliseconds(10) / count;
+  while (count--) {
+    if ((((barRead(sc_regs::IC_RD_DATA.index)) >> 16) & 0x1) == 0) {
+      return;
+    }
+    std::this_thread::sleep_for(sleepSlice);
+  }
+
+  BOOST_THROW_EXCEPTION(IcException() << ErrorInfo::Message("Exceeded timeout waiting for IC data ready"));
+}
+
 uint32_t Ic::read(uint32_t address)
 {
   checkChannelSet();
@@ -92,19 +106,20 @@ uint32_t Ic::read(uint32_t address)
   barWrite(sc_regs::IC_WR_CMD.index, 0x1);
   barWrite(sc_regs::IC_WR_CMD.index, 0x0);
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  //std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
   // Execute the RD State Machine
   barWrite(sc_regs::IC_WR_CMD.index, 0x8);
   barWrite(sc_regs::IC_WR_CMD.index, 0x0);
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  //std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  waitForDataReady();
 
   // Pulse the READ
   barWrite(sc_regs::IC_WR_CMD.index, 0x2);
   barWrite(sc_regs::IC_WR_CMD.index, 0x0);
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  //std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
   // Read the status of the FIFO
   uint32_t ret = barRead(sc_regs::IC_RD_DATA.index);
