@@ -18,7 +18,7 @@ done
 PHASES=""
 for reg in $(seq 399 418); do
     #echo "$GBTCMD ${CRU_PCI_ADDR1} ${CRU_PCI_ADDR2} r ${LINKID} $reg"
-    PHASE=$($GBTCMD ${CRU_PCI_ADDR1} ${CRU_PCI_ADDR2} "r" ${LINKID} $reg | tail -n 1 | cut -d" " -f 4)
+    PHASE=$($GBTCMD ${CRU_PCI_ADDR1} ${CRU_PCI_ADDR2} "r" ${LINKID} $reg | tail -n 1 | cut -d" " -f 2)
     PHASE1=$(echo "$PHASE" | cut -c 4)
     PHASE2=$(echo "$PHASE" | cut -c 3)
 
