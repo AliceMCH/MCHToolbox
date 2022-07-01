@@ -1,6 +1,11 @@
 #! /bin/bash
 
 CRU=$1
+shift
+TGTLINKS=$*
+if [ -n "$TGTLINKS" ]; then
+    TGTLINKS=" $TGTLINKS "
+fi
 
 SCRIPTDIR=$(readlink -f $(dirname $0))
 source ${SCRIPTDIR}/env-${CRU}.sh
@@ -14,9 +19,8 @@ if [ x"${RUNTYPE}" = "xpedestals_ul" ]; then
 fi
 
 
-./cru-send-hard-reset.sh $CRU
-
-./cru-config-trigger.sh $CRU
+#./cru-send-hard-reset.sh $CRU
+#./cru-config-trigger.sh $CRU
 
 #bash ./gen_sampa_config_reset.sh
 
@@ -59,6 +63,14 @@ NDISABLED=0
 CFGFILE=/tmp/ds-config-${CRU}.txt
 rm -f $CFGFILE
 for CRU_LINK in $(seq 0 23); do
+
+    if [ -n "$TGTLINKS" ]; then
+	FOUND=$(echo "$TGTLINKS" | grep " ${CRU_LINK} ")
+	if [ x"$FOUND" = "x" ]; then
+	    continue
+	fi
+    fi
+    
     for DS in $(seq 0 39); do
 	TEST=$(cat board-enable-${CRU}.txt | grep "${FEEID} ${CRU_LINK} ${DS} 1")
 	if [ -z "$TEST" ]; then continue; fi

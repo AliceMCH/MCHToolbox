@@ -1,12 +1,20 @@
 #! /bin/bash
 
 CRU=$1
+shift
+LINKS=$*
 
 ./cru-init-env.sh $CRU
+
 ./cru-ul-links-enable.sh $CRU 0
+./cru-ul-reset.sh $CRU
 
 while [ true ]; do
-    ./cru-solar-config.sh $CRU && sleep 5 && ./cru-ds-config.sh $CRU
+    if [ -z "$LINKS" ]; then
+	./cru-solar-config.sh $CRU && sleep 5 && ./cru-send-hard-reset.sh $CRU && ./cru-config-trigger.sh $CRU && ./cru-ds-config.sh $CRU
+    else
+	./cru-solar-config.sh $CRU $LINKS && sleep 5 $CRU && ./cru-ds-config.sh $CRU $LINKS
+    fi
 
     NFAILED=$(cat sampa_load_${CRU}.log | grep "FAILED" | wc -l)
     NTIMEOUTS=$(cat sampa_load_${CRU}.log | grep "timeout" | wc -l)
@@ -24,6 +32,5 @@ while [ true ]; do
     fi
 done
 
-./cru-ul-reset.sh $CRU
 sleep 1
 ./cru-ul-links-enable.sh $CRU 1

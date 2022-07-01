@@ -1,10 +1,12 @@
 #! /bin/bash
 
 CRU=$1
-TGTLINK=$2
-if [ x"$TGTLINK" = "x" ]; then
-    TGTLINK=-1
+shift
+TGTLINKS=$*
+if [ -n "$TGTLINKS" ]; then
+    TGTLINKS=" $TGTLINKS "
 fi
+
 if [ x"$WAIT" = "x" ]; then
     WAIT=0
 fi
@@ -12,7 +14,7 @@ fi
 source env-${CRU}.sh
 
 while [ true ]; do
-    bash ./cru-check-link-status.sh $CRU
+    bash ./cru-check-link-status.sh $CRU $TGTLINKS
     if [ $? -eq 0 ]; then
 	break
     fi
@@ -29,7 +31,10 @@ bash ./cru-get-ds-enabled.sh $CRU
 
 
 REGFILE=gbtx-regs-${CRU}.txt
-#rm -f "$REGFILE"
+if [ -n "$TGTLINKS" ]; then
+    REGFILE=gbtx-regs-${CRU}-links.txt
+    rm -f "$REGFILE"
+fi
 
 
 if [ ! -e $REGFILE -o $REGFILE -ot board-enable-${CRU}.txt ]; then
@@ -44,7 +49,12 @@ if [ ! -e $REGFILE -o $REGFILE -ot board-enable-${CRU}.txt ]; then
 	echo "LINK: $LINK"
 	if [ -z "$LINK" ]; then continue; fi
 
-	if [ $TGTLINK -ge 0 -a x"$TGTLINK" != x"$LINK" ]; then continue; fi
+	if [ -n "$TGTLINKS" ]; then
+	    FOUND=$(echo "$TGTLINKS" | grep " $LINK ")
+	    if [ x"$FOUND" = "x" ]; then
+		continue
+	    fi
+	fi
 
 	echo "./solar-config.sh ${CRU} $LINK"
 	bash ./solar-config.sh ${CRU} $LINK $REGFILE

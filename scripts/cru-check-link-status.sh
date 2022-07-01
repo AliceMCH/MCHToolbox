@@ -1,6 +1,11 @@
 #! /bin/bash
 
 CRU=$1
+shift
+TGTLINKS=$*
+if [ -n "$TGTLINKS" ]; then
+    TGTLINKS=" $TGTLINKS "
+fi
 
 SCRIPTDIR=$(dirname $0)
 source ${SCRIPTDIR}/env-${CRU}.sh
@@ -57,6 +62,13 @@ for L in $(seq 1 $NLINKS); do
     LINK=$(echo "${CRU_LINKS1}" | tr "," "\n" | sed -n ${L}p)
     #echo "LINK: $LINK"
     if [ -z "$LINK" ]; then continue; fi
+
+    if [ -n "$TGTLINKS" ]; then
+	FOUND=$(echo "$TGTLINKS" | grep " $LINK ")
+	if [ x"$FOUND" = "x" ]; then
+	    continue
+	fi
+    fi
 
     for VAL in 170 0; do
 	#echo "Writing $VAL into register 81 of ${CRU}/${CRU_PCI_ADDR}/${LINK}"
