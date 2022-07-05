@@ -17,6 +17,7 @@
 #include <thread>
 #include <mutex>
 #include <vector>
+#include <sstream>
 
 #define BUILD_FOR_CRU 1
 #define BUILD_FOR_ALF 1
@@ -99,7 +100,7 @@ void enableDsBoards(int fec_idx, std::string pci_addr_str1, std::string pci_addr
 }
 
 
-void fecConfig(int fec_idx, std::string pci_addr_str1, std::string pci_addr_str2, std::vector<DsConfig>* dsConfigVec)
+void fecConfig(int fec_idx, std::string pci_addr_str1, std::string pci_addr_str2, std::vector<DsConfig>* dsConfigVec, std::ostream* ostr)
 {
   o2::alf::roc::PciAddress pci_addr1(pci_addr_str1);
   o2::alf::roc::PciAddress pci_addr2(pci_addr_str2);
@@ -125,7 +126,7 @@ void fecConfig(int fec_idx, std::string pci_addr_str1, std::string pci_addr_str2
     try {
       bar.reset(common::BarFactory::makeBar(pci_addr_str1, 2));
     } catch (std::exception& e) {
-      std::cerr << e.what() << std::endl;
+      *ostr << e.what() << std::endl;
       exit(1);
     }
     std::unique_ptr<common::HdlcCore> hdlc_core(common::HdlcFactory::makeHdlcCore(*(bar.get()), fec_idx, true));
@@ -160,16 +161,16 @@ void fecConfig(int fec_idx, std::string pci_addr_str1, std::string pci_addr_str2
 
       for(int iter = 0; iter < 1; iter++) {
         //std::cout << "Loading SAMPA registers" << std::endl;
-        if( !fec.sampaConfigure(cf0, ds_idx*2, retries, readback, &std::cout) ) {
-          std::cout << "ERROR: Configuration of SAMPA chip " << fec_idx << ":" << ds_idx << ":0"
+        if( !fec.sampaConfigure(cf0, ds_idx*2, retries, readback, ostr) ) {
+          *ostr << "ERROR: Configuration of SAMPA chip " << fec_idx << ":" << ds_idx << ":0"
 		    << " (LINK " << fec_idx << " S" << (fec_idx%6) + 1 << " J" << ds_idx/5 + 1 << " DS" << (ds_idx%5) << ") FAILED" << std::endl << std::endl;
           success = false;
 	  dsOK = false;
           break;
         }
         //std::cout<<"SAMPA "<< fec_idx << ":" << ds_idx*2<<" succesfully configured\n";
-        if( !fec.sampaConfigure(cf1, ds_idx*2+1, retries, readback, &std::cout) ) {
-          std::cout << "ERROR: Configuration of SAMPA chip " << fec_idx << ":" << ds_idx << ":1"
+        if( !fec.sampaConfigure(cf1, ds_idx*2+1, retries, readback, ostr) ) {
+          *ostr << "ERROR: Configuration of SAMPA chip " << fec_idx << ":" << ds_idx << ":1"
 		    << " (LINK " << fec_idx << " S" << (fec_idx%6) + 1 << " J" << ds_idx/5 + 1 << " DS" << (ds_idx%5) << ") FAILED" << std::endl << std::endl;
           success = false;
 	  dsOK = false;
@@ -189,7 +190,7 @@ void fecConfig(int fec_idx, std::string pci_addr_str1, std::string pci_addr_str2
     //if( !success ) break;
   }
   catch (std::runtime_error& e) {
-    std::cerr << e.what() << std::endl;
+    *ostr << e.what() << std::endl;
     success = false;
     //exit(100);
   }
@@ -198,7 +199,7 @@ void fecConfig(int fec_idx, std::string pci_addr_str1, std::string pci_addr_str2
 }
 
 
-void fecCheckConfiguration(int fec_idx, std::string pci_addr_str1, std::string pci_addr_str2, std::vector<DsConfig>* dsConfigVec)
+void fecCheckConfiguration(int fec_idx, std::string pci_addr_str1, std::string pci_addr_str2, std::vector<DsConfig>* dsConfigVec, std::ostream* ostr)
 {
   o2::alf::roc::PciAddress pci_addr1(pci_addr_str1);
   o2::alf::roc::PciAddress pci_addr2(pci_addr_str2);
@@ -218,7 +219,7 @@ void fecCheckConfiguration(int fec_idx, std::string pci_addr_str1, std::string p
     try {
       bar.reset(common::BarFactory::makeBar(pci_addr_str1, 2));
     } catch (std::exception& e) {
-      std::cerr << e.what() << std::endl;
+      *ostr << e.what() << std::endl;
       exit(1);
     }
     std::unique_ptr<common::HdlcCore> hdlc_core(common::HdlcFactory::makeHdlcCore(*(bar.get()), fec_idx, true));
@@ -238,15 +239,15 @@ void fecCheckConfiguration(int fec_idx, std::string pci_addr_str1, std::string p
       auto cf1 = cfg.cf1;
 
       for(int iter = 0; iter < 1; iter++) {
-        if( !fec.sampaCheckConfiguration(cf0, ds_idx*2, retries, &std::cout) ) {
-          std::cout << "ERROR: Configuration of SAMPA chip " << fec_idx << ":" << ds_idx << ":0"
+        if( !fec.sampaCheckConfiguration(cf0, ds_idx*2, retries, ostr) ) {
+          *ostr << "ERROR: Configuration of SAMPA chip " << fec_idx << ":" << ds_idx << ":0"
 	  	    << " (LINK " << fec_idx << " S" << (fec_idx%6) + 1 << " J" << ds_idx/5 + 1 << " DS" << (ds_idx%5)
 	  	    << " CHIP 0) does not match reference" << std::endl << std::endl;
           success = false;
           //break;
         }
-        if( !fec.sampaCheckConfiguration(cf1, ds_idx*2+1, retries, &std::cout) ) {
-          std::cout << "ERROR: Configuration of SAMPA chip " << fec_idx << ":" << ds_idx << ":1"
+        if( !fec.sampaCheckConfiguration(cf1, ds_idx*2+1, retries, ostr) ) {
+          *ostr << "ERROR: Configuration of SAMPA chip " << fec_idx << ":" << ds_idx << ":1"
 	  	    << " (LINK " << fec_idx << " S" << (fec_idx%6) + 1 << " J" << ds_idx/5 + 1 << " DS" << (ds_idx%5)
 	  	    << " CHIP 1) does not match reference" << std::endl << std::endl;
           success = false;
@@ -259,7 +260,7 @@ void fecCheckConfiguration(int fec_idx, std::string pci_addr_str1, std::string p
     //if( !success ) break;
   }
   catch (std::runtime_error& e) {
-    std::cerr << e.what() << std::endl;
+    *ostr << e.what() << std::endl;
     success = false;
     //exit(100);
   }
@@ -422,19 +423,24 @@ int main(int argc, char** argv)
 
 #ifdef PARALLEL
     std::vector<std::thread> workers;
+    std::ostringstream ostr[24];
     for(int fec_idx = 0; fec_idx < 24; fec_idx++) {
       workers.push_back(std::thread(fecCheckConfiguration,
 				    fec_idx,
 				    pci_addr_str1,
 				    pci_addr_str2,
-				    &(dsConfigVec[fec_idx])));
+				    &(dsConfigVec[fec_idx]),
+				    &ostr[fec_idx]));
     }
     for(auto& t : workers) {
       t.join();
     }
+    for(int fec_idx = 0; fec_idx < 24; fec_idx++) {
+      std::cout << ostr[fec_idx].str();
+    }
 #else
     for(int fec_idx = 0; fec_idx < 24; fec_idx++) {
-      fecCheckConfiguration(fec_idx, pci_addr_str1, pci_addr_str2, &(dsConfigVec[fec_idx]));
+      fecCheckConfiguration(fec_idx, pci_addr_str1, pci_addr_str2, &(dsConfigVec[fec_idx]), &std::cout);
       printf("Link %d checked\n",fec_idx);
       //getchar();
     }
@@ -443,19 +449,24 @@ int main(int argc, char** argv)
 
 #ifdef PARALLEL
   std::vector<std::thread> workers;
+  std::ostringstream ostr[24];
   for(int fec_idx = 0; fec_idx < 24; fec_idx++) {
     workers.push_back(std::thread(fecConfig,
         fec_idx,
         pci_addr_str1,
         pci_addr_str2,
-        &(dsConfigVec[fec_idx])));
+	&(dsConfigVec[fec_idx]),
+	&ostr[fec_idx]));
   }
   for(auto& t : workers) {
     t.join();
   }
+  for(int fec_idx = 0; fec_idx < 24; fec_idx++) {
+    std::cout << ostr[fec_idx].str();
+  }
 #else
   for(int fec_idx = 0; fec_idx < 24; fec_idx++) {
-    fecConfig(fec_idx, pci_addr_str1, pci_addr_str2, &(dsConfigVec[fec_idx]));
+    fecConfig(fec_idx, pci_addr_str1, pci_addr_str2, &(dsConfigVec[fec_idx]), &std::cout);
     printf("Link %d configured\n",fec_idx);
     //getchar();
   }
