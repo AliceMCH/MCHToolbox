@@ -717,8 +717,15 @@ int main(int argc, char** argv)
 
       read_header = false;
 
-      if ((int)rdh.cruID & 0x100) {
-	gCSum = true;
+      if (((int)rdh.feeId) > 0) {
+        if (((int)rdh.feeId) & 0x100) {
+          gCSum = true;
+	}
+	printf("rdh.feeId: %04X  gCSum: %d\n", (int)rdh.feeId, (int)gCSum);
+      } else {
+	if ((int)rdh.cruID & 0x100) {
+	  gCSum = true;
+	}
       }
 
       if(gPrintLevel >= 9) {
