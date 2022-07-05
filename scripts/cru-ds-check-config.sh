@@ -10,7 +10,7 @@ source ${SCRIPTDIR}/env-${CRU}.sh
 echo "${RUNTYPE}"
 SAMPLES=5
 if [ x"${RUNTYPE}" = "xpedestals_ul" ]; then
-    SAMPLES=18
+    SAMPLES=5
 fi
 
 #bash ./gen_sampa_config_reset.sh
