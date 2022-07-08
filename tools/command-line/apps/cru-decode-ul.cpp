@@ -721,11 +721,15 @@ int main(int argc, char** argv)
         if (((int)rdh.feeId) & 0x100) {
           gCSum = true;
 	}
-	printf("rdh.feeId: %04X  gCSum: %d\n", (int)rdh.feeId, (int)gCSum);
+	//printf("rdh.feeId: %04X  gCSum: %d\n", (int)rdh.feeId, (int)gCSum);
       } else {
 	if ((int)rdh.cruID & 0x100) {
 	  gCSum = true;
 	}
+      }
+
+      if ((cru_id * 2 + rdh.endPointID) != ((int)rdh.feeId & 0xFF)) {
+	printf("ERROR: wrong feeId: %d  cruId: %d\n", (int)rdh.feeId & 0xFF, cru_id);
       }
 
       if(gPrintLevel >= 9) {
