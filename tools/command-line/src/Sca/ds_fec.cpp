@@ -400,6 +400,18 @@ DsFec::sampaConfigure(std::string filename, int16_t sampa_id, uint8_t nRetry, bo
     if( write_failed ) { failed = true; break; }
     //break;
   }
+
+  if (failed) {
+    // disable all channels if the configuration failed. Try at most 5 times
+    for (int iter = 0; iter < 5; iter++) {
+      bool ret1 = sampa_[sampa_id]->writeRegister(0x24, 0);
+      bool ret2 = sampa_[sampa_id]->writeRegister(0x25, 0);
+      bool ret3 = sampa_[sampa_id]->writeRegister(0x26, 0);
+      bool ret4 = sampa_[sampa_id]->writeRegister(0x27, 0);
+      if (ret1 && ret2 && ret3 && ret4) break;
+    }
+  }
+
   //if( os ) sampa2.dumpRegisters(*os);
   return( !failed );
 }
