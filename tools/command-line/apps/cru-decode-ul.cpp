@@ -400,6 +400,10 @@ decode_state_t Add10BitsOfData(uint64_t data, DualSampa& dsr, DualSampaGroup* ds
 	    result = DECODE_STATE_HEARTBEAT_FOUND;
 	    dsr.nbHB[dsr.header.fChipAddress%2] += 1;
 	  }
+	} else if (header->fPkgType == 1) {
+	  printf("WARNING: [L %d B %d DS %d CHIP %d] data truncated\n", dsr.lid, dsr.lid*40+dsr.id, dsr.id, (int)dsr.header.fChipAddress);
+	  dsr.status = headerToRead;
+	  result = DECODE_STATE_PACKET_END;
 	} else if (header->fPkgType == 4) {
 	  dsr.status = sizeToRead;
 	  result = DECODE_STATE_HEADER_FOUND;
@@ -728,8 +732,9 @@ int main(int argc, char** argv)
 	}
       }
 
-      if ((cru_id * 2 + rdh.endPointID) != ((int)rdh.feeId & 0xFF)) {
-	printf("ERROR: wrong feeId: %d  cruId: %d\n", (int)rdh.feeId & 0xFF, cru_id);
+
+      if ((((int)rdh.cruID & 0xFF) * 2 + rdh.endPointID) != ((int)rdh.feeId & 0xFF)) {
+	printf("ERROR: wrong feeId: %d  cruId: %d\n", (int)rdh.feeId & 0xFF, (int)rdh.cruID);
       }
 
       if(gPrintLevel >= 9) {
