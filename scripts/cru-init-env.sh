@@ -10,7 +10,8 @@ echo "RUNTYPE:    $RUNTYPE"
 
 export I2C_RETRIES=2
 
-export ADC_THR=0C
+#export ADC_THR=0C
+export ADC_THR=7F
 
 export PED_THR=500
 export NOISE_THR=2.0
