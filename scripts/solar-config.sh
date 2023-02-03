@@ -66,42 +66,48 @@ echo -n "J8: "; echo -n "$PATT" | cut -c 1-5
 echo "${LINKID} 35 $(( 16#42 ))" >> "$REGFILE"
 
 # clock enable
-for reg in 255 333 348; do
-    for iter in $(seq 1 5); do
-	P=$(echo -n "$PATT" | tail -c $(($iter*8)) | head -c 8)
-	INPATTREG=$(echo "ibase=2; $P" | bc)
-	#../GBT_IC/build/gbt-ic ${CRU_PCI_ADDR} "w" ${LINKID} $reg 255
-	echo "${LINKID} $reg $INPATTREG" >> "$REGFILE"
-	#echo "${LINKID} $reg 255" >> "$REGFILE"
-	reg=$((reg+3))
+offset=0
+for iter in $(seq 1 5); do
+    P=$(echo -n "$PATT" | tail -c $(($iter*8)) | head -c 8)
+    INPATTREG=$(echo "ibase=2; $P" | bc)
+    for reg in 255 333 348; do
+	R=$((reg+offset))
+	#../GBT_IC/build/gbt-ic ${CRU_PCI_ADDR} "w" ${LINKID} $R 255
+	echo "${LINKID} $R $INPATTREG" >> "$REGFILE"
+	#echo "${LINKID} $R 255" >> "$REGFILE"
     done
+    offset=$((offset+3))
 done
 
 
 # input enable
-for reg in 81 82 83; do
-    for iter in $(seq 1 5); do
-	P=$(echo -n "$PATT" | tail -c $(($iter*8)) | head -c 8)
-	INPATTREG=$(echo "ibase=2; $P" | bc)
-	#INPATTREG=255
-	#echo "I $iter  P: $P"
-	#echo "INPATTREG: $INPATTREG"
-	#../GBT_IC/build/gbt-ic ${CRU_PCI_ADDR} "w" ${LINKID} $reg 255
-	echo "${LINKID} $reg $INPATTREG" >> "$REGFILE"
-	#echo "${LINKID} $reg 255" >> "$REGFILE"
-	#echo "$reg $INPATTREG"
-	reg=$((reg+24))
+offset=0
+for iter in $(seq 1 5); do
+    P=$(echo -n "$PATT" | tail -c $(($iter*8)) | head -c 8)
+    INPATTREG=$(echo "ibase=2; $P" | bc)
+    #INPATTREG=255
+    #echo "I $iter  P: $P"
+    #echo "INPATTREG: $INPATTREG"
+    for reg in 81 82 83; do
+	R=$((reg+offset))
+	#../GBT_IC/build/gbt-ic ${CRU_PCI_ADDR} "w" ${LINKID} $R 255
+	echo "${LINKID} $R $INPATTREG" >> "$REGFILE"
+	#echo "${LINKID} $R 255" >> "$REGFILE"
+	#echo "$R $INPATTREG"
     done
+    offset=$((offset+24))
 done
 
 
 # signal output enable
-for reg in 256 334 349; do
-    for iter in $(seq 1 5); do
-	#../GBT_IC/build/gbt-ic ${CRU_PCI_ADDR} "w" ${LINKID} $reg 255
-	echo "${LINKID} $reg 255" >> "$REGFILE"
-	reg=$((reg+3))
+offset=0
+for iter in $(seq 1 5); do
+    for reg in 256 334 349; do
+	R=$((reg+offset))
+	#../GBT_IC/build/gbt-ic ${CRU_PCI_ADDR} "w" ${LINKID} $R 255
+	echo "${LINKID} $R 255" >> "$REGFILE"
     done
+    offset=$((offset+3))
 done
 
 
