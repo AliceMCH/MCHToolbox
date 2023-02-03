@@ -1,9 +1,10 @@
 #! /bin/bash
 
 SCRIPTDIR=$(readlink -f $(dirname $0))
-
-rm -rf ${SCRIPTDIR}/solar-clock-phases.txt
-
+for CRU in $(seq 0 31); do
+    if [ ! -e ${SCRIPTDIR}/solar-clock-phases-${CRU}.txt ]; then continue; fi
+    rm -rf ${SCRIPTDIR}/solar-clock-phases-${CRU}.txt
+done
 for CRU in $(seq 0 31); do
     if [ ! -e ${SCRIPTDIR}/env-${CRU}.sh ]; then continue; fi
     source ${SCRIPTDIR}/env-${CRU}.sh
@@ -23,7 +24,7 @@ for CRU in $(seq 0 31); do
 	CRATEID=$(echo "scale=0; $LINKID / 8" | bc)
 	PHASES=$(cat "${SCRIPTDIR}/GBT Clock Phases/solar-clock-phase-${CRU}-${LINK}.txt")
 
-	echo "$LINK $CRATEID $PHASES" >> ${SCRIPTDIR}/solar-clock-phases.txt
+	echo "$LINK $CRATEID $PHASES" >> ${SCRIPTDIR}/solar-clock-phases-${CRU}.txt
 
     done
 
