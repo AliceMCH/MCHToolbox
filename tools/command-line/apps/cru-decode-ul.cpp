@@ -1089,11 +1089,12 @@ int main(int argc, char** argv)
 
   printf("\n==== HeartBeat packets ====\n\n");
 
-  for(unsigned int i = 0; i < board_vec.size(); i++) {
-    int l = board_vec[i] / 40;
-    int b = board_vec[i] % 40;
-    if (ds[0][l][b].nbHB[0] > 0 || ds[0][l][b].nbHB[1] > 1)
-      printf("L%d B%d J%d DS%d: HB packets %d %d\n", l, board_vec[i], ((b/5)+1), (b%5), ds[0][l][b].nbHB[0], ds[0][l][b].nbHB[1]);
+
+  for(int l = 0; l < 24; l++) {
+    for(int b = 0; b < 40; b++) {
+      if (ds[0][l][b].nbHB[0] > 0 || ds[0][l][b].nbHB[1] > 1)
+	printf("L%d B%d J%d DS%d: HB packets %d %d\n", l, b, ((b/5)+1), (b%5), ds[0][l][b].nbHB[0], ds[0][l][b].nbHB[1]);
+    }
   }
 
   return 0;
