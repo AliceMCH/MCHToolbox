@@ -428,6 +428,23 @@ decode_state_t Add10BitsOfData(uint64_t data, DualSampa& dsr, DualSampaGroup* ds
 	    dsr.data = 0;
 	    dsr.packetsize = 0;
 	}
+
+	// if header looks ok, check consistency of chip address
+	if (dsr.status != notSynchronized) {
+	  int eLinkId = dsr.id % 5;
+	  int chipAddMin = eLinkId * 2;
+	  int chipAddMax = chipAddMin + 1;
+
+	  // the chip address from the SAMPA header must be consistent with the e-Link index
+	  int chipAdd = dsr.header.fChipAddress;
+	  if (chipAdd < chipAddMin || chipAdd > chipAddMax) {
+	    printf("ERROR: [L %d B %d DS %d CHIP %d CH %d] inconsistent chip address in data header\n", dsr.lid, dsr.lid*40+dsr.id, dsr.id, (int)dsr.header.fChipAddress, (int)dsr.header.fChannelAddress);
+	    dsr.status = notSynchronized;
+	    dsr.bit = 0;
+	    dsr.data = 0;
+	    dsr.packetsize = 0;
+	  }
+	}
       }
     }
     break;
@@ -695,7 +712,7 @@ int main(int argc, char** argv)
       }
 
       bool rdhError = false;
-      if (cru_id == target_cru_id) {
+      if (cru_id == target_cru_id && gPrintLevel >= 1) {
 	if ((rdh.stopBit != 0) && (rdh.bunchCrossing != 3563)) {
 	  printf("ERROR: inconsisted RDH stop bit\n");
 	  rdhError = true;
@@ -1070,10 +1087,13 @@ int main(int argc, char** argv)
     }
   }
 
+  printf("\n==== HeartBeat packets ====\n\n");
+
   for(unsigned int i = 0; i < board_vec.size(); i++) {
     int l = board_vec[i] / 40;
     int b = board_vec[i] % 40;
-    //printf("L%d B%d J%d DS%d: HB packets %d %d\n", l, board_vec[i], ((b/5)+1), (b%5), ds[0][l][b].nbHB[0], ds[0][l][b].nbHB[1]);
+    if (ds[0][l][b].nbHB[0] > 0 || ds[0][l][b].nbHB[1] > 1)
+      printf("L%d B%d J%d DS%d: HB packets %d %d\n", l, board_vec[i], ((b/5)+1), (b%5), ds[0][l][b].nbHB[0], ds[0][l][b].nbHB[1]);
   }
 
   return 0;
