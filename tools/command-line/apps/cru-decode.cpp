@@ -539,12 +539,6 @@ int main(int argc, char** argv)
     printf("-");
   printf("\n\n");
 
-  //for(unsigned int i = 0; i < board_vec.size(); i++) {
-  //  int l = board_vec[i] / 40;
-  //  int b = board_vec[i] % 40;
-  //  printf("L%d B%d J%d DS%d: HB packets %d %d\n", l, board_vec[i], ((b/5)+1), (b%5), ds[l][b].nbHB[0], ds[l][b].nbHB[1]);
-  //}
-
   for(unsigned int i = 0; i < board_vec.size(); i++) {
     int l = board_vec[i] / 40;
     int b = board_vec[i] % 40;

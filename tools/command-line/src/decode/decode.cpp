@@ -487,8 +487,8 @@ decode_state_t Add1BitOfData(uint64_t gbtdata, DualSampa& dsr, DualSampaGroup* d
           }
           if (ds->header.fPkgType == 0) { // Heartbeat: Pkg 0, NbOfWords 0 ?, ChAdd 21
             //gNbErrors++;
-            printf("SAMPA [L %2d, DS %2d (J%1d,%1d), B %3d]: HeartBeat word found\n",
-              ds->lid,ds->id,ds->id/5+1,ds->id%5,(ds->lid*40+ds->id));
+            //printf("SAMPA [L %2d, DS %2d (J%1d,%1d), B %3d]: HeartBeat word found\n",
+            //  ds->lid,ds->id,ds->id/5+1,ds->id%5,(ds->lid*40+ds->id));
             ds->status = headerToRead;
             ds->bxc[ds->header.fChipAddress%2] = ds->header.fBunchCrossingCounter;
 	    ds->nbHB[ds->header.fChipAddress%2] += 1;
