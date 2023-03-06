@@ -706,7 +706,7 @@ int main(int argc, char** argv)
       BLOCK_SIZE = CRUh.block_length;
       int cru_id = ((int)CRUh.cru_id) & 0xFF;
 
-      if( CRUh.header_version < 4 || CRUh.header_version > 6 || CRUh.header_size != 64 ) {
+      if( CRUh.header_version < 4 || CRUh.header_version > 7 || CRUh.header_size != 64 ) {
 	printf("ERROR: bad RDH received\n");
 	break;
       }
