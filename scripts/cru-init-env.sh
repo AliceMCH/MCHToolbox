@@ -26,7 +26,7 @@ export NOISE_THR=2.0
 #export ADC_THR=FF
 
 
-export TF_LENGTH=128
+export TF_LENGTH=32
 
 CRU_UL_ENABLED=0
 if [ x"${RUNTYPE}" = "xpedestals_ul" ] ||              \
