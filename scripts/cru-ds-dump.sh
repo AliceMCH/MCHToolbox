@@ -62,7 +62,8 @@ for CRU_LINK in $(seq 0 23); do
 	#echo "${FEEID} ${CRU_LINK} ${DS} enabled"
 	NENABLED=$((NENABLED+1))
 
-	if [ x"$PEDESTALS" != "x1" ]; then
+	#if [ x"$PEDESTALS" != "x1" ]; then
+	if [ "x" = "y" ]; then
 	    cp config_sampa_${CRU}_0.txt /tmp/config_sampa_${CRU_LINK}_${DS}_0.txt
 	    cp config_sampa_${CRU}_1.txt /tmp/config_sampa_${CRU_LINK}_${DS}_1.txt
 	    echo "${CRU_LINK} ${DS}  /tmp/config_sampa_${CRU_LINK}_${DS}_0.txt /tmp/config_sampa_${CRU_LINK}_${DS}_1.txt" >> $CFGFILE
@@ -102,6 +103,7 @@ echo "$NDISABLED channels disabled"
 
 
 #(cd ../alice-tpc-fec-utils-mt/build && make -j 8) || exit 1
+rm -rf Sampa-Dump-CRU-${CRU} sampa-dump-*-*-*.txt
 ERROR=0
 for I in $(seq 1 1); do
     #echo "../alice-tpc-fec-utils-mt/build/src/cru/tdsinit "${CRU_PCI_ADDR}" ds_config.txt"
@@ -122,6 +124,9 @@ for I in $(seq 1 1); do
 	ERROR=1
     fi
 done
+
+mkdir -p Sampa-Dump-CRU-${CRU}
+mv sampa-dump-*-*-*.txt Sampa-Dump-CRU-${CRU}
 
  
 exit $ERROR

@@ -323,7 +323,7 @@ void fecDumpConfiguration(int fec_idx, std::string pci_addr_str1, std::string pc
 
       for(int iter = 0; iter < 1; iter++) {
 	char dumpFileName[501];
-	snprintf(dumpFileName, 500, "sampa_dump_%d_%d_0.txt", fec_idx, ds_idx);
+	snprintf(dumpFileName, 500, "sampa-dump-%d-%d-0.txt", fec_idx, ds_idx);
         //std::cout << "Loading SAMPA registers" << std::endl;
         if( !fec.sampaDumpConfiguration(cf0, dumpFileName, ds_idx*2, retries, &std::cout) ) {
           std::cout << "ERROR: Configuration of SAMPA chip " << fec_idx << ":" << ds_idx << ":0"
@@ -331,7 +331,7 @@ void fecDumpConfiguration(int fec_idx, std::string pci_addr_str1, std::string pc
           success = false;
           break;
         }
-	snprintf(dumpFileName, 500, "sampa_dump_%d_%d_1.txt", fec_idx, ds_idx);
+	snprintf(dumpFileName, 500, "sampa-dump-%d-%d-1.txt", fec_idx, ds_idx);
         //std::cout<<"SAMPA "<< fec_idx << ":" << ds_idx*2<<" succesfully configured\n";
         if( !fec.sampaDumpConfiguration(cf1, dumpFileName, ds_idx*2+1, retries, &std::cout) ) {
           std::cout << "ERROR: Configuration of SAMPA chip " << fec_idx << ":" << ds_idx << ":1"
