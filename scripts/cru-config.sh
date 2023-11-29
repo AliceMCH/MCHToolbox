@@ -39,8 +39,14 @@ roc-reg-write --id=${CRU_PCI_ADDR} --channel=2 --address=0xc80008 --value="${LIN
 
 # set pat-player in default mode
 #echo "roc-pat-player --id=${CRU_PCI_ADDR} --idle=0x0C0300C0300C0300C030 --sync=0x3C0F03C0F03C0F03C0F0 --sync-length=1 --sync-delay=0 --sync-trigger-select=4"
-roc-pat-player --id=${CRU_PCI_ADDR} --idle=0x0C0300C0300C0300C030 \
-    --sync=0x3C0F03C0F03C0F03C0F0 \
-    --sync-length=1 --sync-delay=0 --sync-trigger-select=4
+#roc-pat-player --id=${CRU_PCI_ADDR} --idle=0x0C0300C0300C0300C030 \
+#    --sync=0x3C0F03C0F03C0F03C0F0 \
+#    --sync-length=1 --sync-delay=0 --sync-trigger-select=4
+
+# reset the pat-player
+${prefix}o2-roc-reg-write --id=${CRU_PCI_ADDR1} --ch=2 --address=00260000 --val=0x1
+${prefix}o2-roc-reg-write --id=${CRU_PCI_ADDR1} --ch=2 --address=00260000 --val=0x0
+${prefix}o2-roc-reg-write --id=${CRU_PCI_ADDR2} --ch=2 --address=00260000 --val=0x1
+${prefix}o2-roc-reg-write --id=${CRU_PCI_ADDR2} --ch=2 --address=00260000 --val=0x0
 
 echo ""; echo "Configuration of CRU $CRU completed."
