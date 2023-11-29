@@ -18,7 +18,7 @@ if [ x"${CRU_CLKSRC}" = "xlocal" ]; then
     echo "o2-roc-pat-player --id=${CRU_PCI_ADDR} --pat0=${PATT_IDLE} --pat1=${PATT_SYNC} --pat1-length=1 --pat1-delay=0 --pat1-trigger-select=0x10 --execute-pat1-now"
     o2-roc-pat-player --id=${CRU_PCI_ADDR} --pat0=${PATT_IDLE} \
 	--pat1=${PATT_SYNC} \
-	--pat1-length=1 --pat1-delay=0 --pat1-trigger-select=0x10 --execute-pat1-now
+	--pat1-length=1 --pat1-delay=0 --execute-pat1-now
 
     ./cru-config-trigger.sh $CRU
 fi
