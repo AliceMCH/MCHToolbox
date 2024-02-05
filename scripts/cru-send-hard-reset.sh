@@ -4,6 +4,12 @@ CRU=$1
 
 SCRIPTDIR=$(dirname $0)
 source ${SCRIPTDIR}/env-${CRU}.sh
+ 
+roc-pat-player --id=${CRU_PCI_ADDR} --pat0=${PATT_IDLE} --pat2=0x0 --pat2-length=3000  --execute-pat2-now
+roc-pat-player --id=${CRU_PCI_ADDR} --read-back 
+
+exit
+
 
 PATT1=${PATT_IDLE}
 P0=$(echo -n ${PATT1} | cut -c 15-22)
