@@ -9,7 +9,7 @@ while read LINE; do
     CRU=$(echo "$LINE" | cut -f 1)
 
     if [ -n "$CRU" ]; then
-	xterm -bg black -fg white -geometry 100x45 -T "cru-config.sh $CRU" -e ./cru-set-feeid $CRU &
+	xterm -bg black -fg white -geometry 100x45 -T "cru-set-feeid.sh $CRU" -e ./cru-set-feeid.sh $CRU &
     fi
 
 done < "$FLPMAP"
