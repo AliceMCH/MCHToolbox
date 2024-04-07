@@ -63,7 +63,24 @@ echo -n "J8: "; echo -n "$PATT" | cut -c 1-5
 
 #echo "../GBT_IC/build/gbt-ic ${CRU_PCI_ADDR} w ${LINKID} 35 $(( 16#42 ))"
 #../GBT_IC/build/gbt-ic ${CRU_PCI_ADDR} "w" ${LINKID} 35 $(( 16#42 ))
-echo "${LINKID} 35 $(( 16#42 ))" >> "$REGFILE"
+#echo "${LINKID} 35 $(( 16#42 ))" >> "$REGFILE"
+
+
+
+if [ -e solar-modifiedChargepumpRegister-${CRU}.txt ]; then
+
+	while read line;do
+		read -a array <<< "$line"
+         	if  [ x"${LINKID}" = x"${array[0]}" ]  ; then 
+			echo "Setting  custom config  (${array[1]}) on solar  link ${LINKID} " 
+			echo "${LINKID} 35 $(( 16#${array[1]} ))" >> "$REGFILE"
+		fi 
+
+	done < solar-modifiedChargepumpRegister-${CRU}.txt
+else 
+	echo "${LINKID} 35 $(( 16#42 ))" >> "$REGFILE"
+fi 
+
 
 # clock enable
 offset=0

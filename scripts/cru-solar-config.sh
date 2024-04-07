@@ -21,7 +21,12 @@ while [ true ]; do
     echo ""; echo "";
     RED='\033[0;31m'
     NC='\033[0m' # No Color
-    echo -n -e "${RED}Some SOLAR boards are DOWN, please try to power-cycle the corresponding crates and press enter...${NC}"
+    echo -n -e "${RED}Some SOLAR boards are DOWN, do you want to retry? [Y/n]: ${NC}"
+    read dummy
+    if  [[ "$dummy" = "n" -o "$dummy" = "N" ]];  then
+	break
+    fi
+    echo -n -e "${RED}Please try to power-cycle the corresponding crates and press enter...${NC}"
     read dummy
 done
 
