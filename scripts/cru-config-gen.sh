@@ -32,7 +32,8 @@ if [ x"${CRU_UL_ENABLED}" = "x1" ]; then
 fi
 
 if [ x"${CRU_LINKS2_1}" != "x" ]; then
-    RC_OPT2="--id=${CRU_SN}:0 --links=${CRU_LINKS2_1}"
+    #RC_OPT2="--id=${CRU_SN}:0 --links=${CRU_LINKS2_1}"
+    RC_OPT2="--id=${CRU_SN}:0 --links=0"
 else
     RC_OPT2="--id=${CRU_SN}:0 --no-gbt"
 fi
@@ -40,7 +41,8 @@ fi
 echo "$RC_OPT $RC_OPT2"
 
 if [ x"${CRU_LINKS2_2}" != "x" ]; then
-    RC_OPT2="--id=${CRU_SN}:1 --links=${CRU_LINKS2_2}"
+    #RC_OPT2="--id=${CRU_SN}:1 --links=${CRU_LINKS2_2}"
+    RC_OPT2="--id=${CRU_SN}:1 --links=0"
 else
     RC_OPT2="--id=${CRU_SN}:1 --no-gbt"
 fi
