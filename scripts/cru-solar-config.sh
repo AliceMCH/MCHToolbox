@@ -30,6 +30,53 @@ while [ true ]; do
     read dummy
 done
 
+
+REGFILE=gbtx-regs-no-outputs-${CRU}.txt
+rm -f "$REGFILE"
+
+result=0
+NLINKS=$(echo "${CRU_LINKS1}" | tr "," "\n" | wc -l)
+for L in $(seq 1 $NLINKS); do
+
+    LINK=$(echo "${CRU_LINKS1}" | tr "," "\n" | sed -n ${L}p)
+    echo "LINK: $LINK"
+    if [ -z "$LINK" ]; then continue; fi
+
+    if [ -n "$TGTLINKS" ]; then
+	FOUND=$(echo "$TGTLINKS" | grep " $LINK ")
+	if [ x"$FOUND" = "x" ]; then
+	    continue
+	fi
+    fi
+
+    echo "./solar-gbtx-output-disable.sh ${CRU} $LINK"
+    bash ./solar-gbtx-output-disable.sh ${CRU} $LINK $REGFILE
+    result=$?
+    if [ x"$result" != "x0" ]; then
+	break
+    fi
+
+done
+
+
+GBTCMD=../tools/command-line/build/gbt-config
+
+echo "Disabling outputs for ${CRU}/${CRU_PCI_ADDR}"
+echo "$GBTCMD ${CRU_PCI_ADDR1} ${CRU_PCI_ADDR2} \"f\" \"$REGFILE\""
+while [ true ]; do
+    $GBTCMD ${CRU_PCI_ADDR1} ${CRU_PCI_ADDR2} "f" "$REGFILE"
+    if [ $? -eq 0 ]; then
+	break
+    fi
+    echo ""; echo "";
+    RED='\033[0;31m'
+    NC='\033[0m' # No Color
+    echo -n -e "${RED}Some SOLAR boards did not configure properly, please try to power-cycle the corresponding crates and press enter...${NC}"
+    read dummy
+done
+
+sleep 5
+
 bash ./cru-get-ds-enabled.sh $CRU
 
 #export CRU

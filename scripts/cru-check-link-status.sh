@@ -21,7 +21,7 @@ for DW in 0 1; do
 	continue;
     fi
     TEST=$(./cru-link-status.sh $CRU $DW)
-    echo -n "CRU $1:$DW link status: "
+    echo -n "CRU $CRU:$DW link status: "
     OK=1
     if [ -n "$TEST" ]; then
 	NL=$(echo "$TEST" | wc -l)
