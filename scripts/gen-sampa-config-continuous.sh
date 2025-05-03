@@ -35,9 +35,19 @@ echo "-1 0x25 0xff" >> "${CONFIGFILE}"
 echo "-1 0x26 0xff" >> "${CONFIGFILE}"
 echo "-1 0x27 0xff" >> "${CONFIGFILE}"
 
-# DPCFG 200  # 200 - BC3; 100 - BC2
+# DPCFG:
+# BC1: 0x0000
+# BC2: 0x0100
+# BC3: 0x0200
+if [ x"${BC_MODE}" = "x1" ]; then
+    DPCFG="0x0000"
+elif [ x"${BC_MODE}" = "x2" ]; then
+    DPCFG="0x0100"
+else
+    DPCFG="0x0200"
+fi
 for ch in $(seq 0 31); do
-  echo "$ch 0x18 0x0200" >> "${CONFIGFILE}"
+  echo "$ch 0x18 ${DPCFG}" >> "${CONFIGFILE}"
 done
 
 # ZSCFG 7F  (7F -> pulses > 2, 7D -> pulses > 1)

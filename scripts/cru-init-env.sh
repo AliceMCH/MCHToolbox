@@ -4,9 +4,13 @@ CRU=$1
 
 source clksource.sh
 source runtype.sh
+source bcmode.sh
+source zsoffset.sh
 
 echo "CRU_CLKSRC: ${CRU_CLKSRC}"
 echo "RUNTYPE:    $RUNTYPE"
+echo "BC_MODE:    ${BC_MODE}"
+echo "ZS_OFFSET:  ${ZS_OFFSET}"
 
 export I2C_RETRIES=2
 
@@ -207,3 +211,6 @@ echo "export PED_THR=${PED_THR}" >> ${ENVFILE}
 echo "export NOISE_THR=${NOISE_THR}" >> ${ENVFILE}
 echo "export ADC_THR=${ADC_THR}" >> ${ENVFILE}
 echo "export I2C_RETRIES=${I2C_RETRIES}" >> ${ENVFILE}
+echo "export BC_MODE=${BC_MODE}" >> ${ENVFILE}
+echo "export ZS_OFFSET=${ZS_OFFSET}" >> ${ENVFILE}
+

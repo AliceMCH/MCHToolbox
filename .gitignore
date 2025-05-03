@@ -47,3 +47,6 @@ scripts/config_sampa*.txt
 scripts/solar-clock-phase-*.txt
 scripts/gbtx-regs-*.txt
 scripts/sampa_dump_*.txt
+scripts/Pedestals
+FLP-control-scripts/Pedestals
+
