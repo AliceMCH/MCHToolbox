@@ -42,7 +42,9 @@ echo "-1 0x27 0xff" >> "${CONFIGFILE}"
 if [ x"${BC_MODE}" = "x1" ]; then
     DPCFG="0x0000"
     # Set initial values of the pedestals to the maximum
-    echo "32 0x0C 0x3FF" >> "${CONFIGFILE}"
+    for ch in $(seq 0 31); do
+	echo "$ch 0x0C 0x3FF" >> "${CONFIGFILE}"
+    done
 elif [ x"${BC_MODE}" = "x2" ]; then
     DPCFG="0x0100"
 else
@@ -63,6 +65,6 @@ for ch in $(seq 0 31); do
   #echo "$ch 0x09 0x0008" >> "${CONFIGFILE}"
 done
 
-echo "-1 0x0e 0x05" >> "${CONFIGFILE}"
+#echo "-1 0x0e 0x05" >> "${CONFIGFILE}"
 
 done

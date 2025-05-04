@@ -141,6 +141,9 @@ for CRU_LINK in $(seq 0 23); do
 		done
 
 	    fi
+
+	    echo "-1 0x0e 0x05" >> /tmp/config_sampa_${CRU_LINK}_${DS}_0.txt
+	    echo "-1 0x0e 0x05" >> /tmp/config_sampa_${CRU_LINK}_${DS}_1.txt
 	else
 	    echo "${CRU_LINK} ${DS} config_sampa_${CRU}_0.txt config_sampa_${CRU}_1.txt" >> $CFGFILE
 	fi
