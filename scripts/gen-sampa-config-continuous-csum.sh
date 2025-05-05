@@ -47,6 +47,10 @@ if [ x"${BC_MODE}" = "x1" ]; then
     done
 elif [ x"${BC_MODE}" = "x2" ]; then
     DPCFG="0x0100"
+elif [ x"${BC_MODE}" = "x23" ]; then
+    DPCFG="0x0300"
+elif [ x"${BC_MODE}" = "x32" ]; then
+    DPCFG="0x0300"
 else
     DPCFG="0x0200"
 fi
@@ -55,9 +59,16 @@ for ch in $(seq 0 31); do
 done
 
 # ZSCFG 7F  (7F -> pulses > 2, 7D -> pulses > 1)
-for ch in $(seq 0 31); do
-  echo "$ch 0x0b 0x007F" >> "${CONFIGFILE}"
-done
+if [ x"${BC_MODE}" = "x32" ]; then
+  for ch in $(seq 0 31); do
+    # bit 7 set to 1 => change position of BC3 in pipeline (BC3 after BC2)
+    echo "$ch 0x0b 0x00FF" >> "${CONFIGFILE}"
+  done
+else
+  for ch in $(seq 0 31); do
+    echo "$ch 0x0b 0x007F" >> "${CONFIGFILE}"
+  done
+fi
 
 # ZSTHR 0C
 for ch in $(seq 0 31); do
