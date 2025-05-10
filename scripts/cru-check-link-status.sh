@@ -54,7 +54,7 @@ echo ""; echo "";
 
 GBTCMD=../tools/command-line/build/gbt-config
 
-echo "CRU $1 read/write status: "
+echo "CRU ${CRU} read/write status: "
 NLINKS=$(echo "${CRU_LINKS1}" | tr "," "\n" | wc -l)
 OK=1
 for L in $(seq 1 $NLINKS); do

@@ -6,7 +6,7 @@ LINKS=$*
 echo "Will only reconfigure cru ${CRU} and links ${LINKS} keeping CRU ON"
 echo -e "\n"
 
-./cru-ul-links-enable.sh $CRU 0; sleep 1
+./cru-ul-links-enable.sh $CRU 0 $LINKS; sleep 1
 
 ./cru-solar-config.sh $CRU $LINKS && sleep 5  && ./cru-ds-config.sh $CRU $LINKS
 
