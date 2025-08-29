@@ -19,7 +19,7 @@ for L in $(seq 1 $NLINKS); do
     FEC=$($GBTCMD "${CRU_PCI_ADDR1}" "${CRU_PCI_ADDR1}" "r" ${LINKID} 435 | cut -d' ' -f 3)
     LOCK=$($GBTCMD "${CRU_PCI_ADDR1}" "${CRU_PCI_ADDR1}" "r" ${LINKID} 434 | cut -d' ' -f 3)
     #echo "  ${LINKID}"'\t'" FEC=$FEC"'\t'" LOCK=$LOCK"
-    printf "  link: %2d\t FEC: %4d\t LOCK: %4d\n" ${LINKID} $FEC $LOCK
+    printf "  CRU %2d link %2d\t FEC: %4d\t LOCK: %4d\n" ${CRU} ${LINKID} $FEC $LOCK
     #FECL1="${FECL1}\nL${LINKID}=${FEC}"
 done
 
