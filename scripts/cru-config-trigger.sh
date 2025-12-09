@@ -17,7 +17,7 @@ PATT3=${PATT_IDLE}
 TRIGMASK1=0x0
 TRIGMASK2=0x0
 TRIGMASK3=0x0
-TFRATE=351 # Hz
+TFRATE=352 # Hz
 TSTAMP=0
 
 if [ x"$RUNTYPE" = "xpedestals" -o x"$RUNTYPE" = "xpedestals_ul" ]; then
@@ -59,44 +59,45 @@ P0=$(echo -n ${PATT0} | cut -c 15-22)
 P1=$(echo -n ${PATT0} | cut -c 7-14)
 P2=$(echo -n ${PATT0} | cut -c 3-6)
 echo "PAT0: $PATT0   P0: $P0   P1: $P1   P2: $P2"
-${prefix}o2-roc-reg-write --id=${addr} --ch=2 --address=00260004 --val=0x${P0}
-${prefix}o2-roc-reg-write --id=${addr} --ch=2 --address=00260008 --val=0x${P1}
-${prefix}o2-roc-reg-write --id=${addr} --ch=2 --address=0026000C --val=0x${P2}
+${prefix}o2-roc-reg-write --id=${addr} --ch=2 --address=0x260004 --val=0x${P0}
+${prefix}o2-roc-reg-write --id=${addr} --ch=2 --address=0x260008 --val=0x${P1}
+${prefix}o2-roc-reg-write --id=${addr} --ch=2 --address=0x26000C --val=0x${P2}
 # PAT1 SYNC
 P0=$(echo -n ${PATT1} | cut -c 15-22)
 P1=$(echo -n ${PATT1} | cut -c 7-14)
 P2=$(echo -n ${PATT1} | cut -c 3-6)
 echo "PAT1: $PATT1   P0: $P0   P1: $P1   P2: $P2"
-${prefix}o2-roc-reg-write --id=${addr} --ch=2 --address=00260010 --val=0x${P0}
-${prefix}o2-roc-reg-write --id=${addr} --ch=2 --address=00260014 --val=0x${P1}
-${prefix}o2-roc-reg-write --id=${addr} --ch=2 --address=00260018 --val=0x${P2}
+${prefix}o2-roc-reg-write --id=${addr} --ch=2 --address=0x260010 --val=0x${P0}
+${prefix}o2-roc-reg-write --id=${addr} --ch=2 --address=0x260014 --val=0x${P1}
+${prefix}o2-roc-reg-write --id=${addr} --ch=2 --address=0x260018 --val=0x${P2}
 # PAT2 RESET
 P0=$(echo -n ${PATT2} | cut -c 15-22)
 P1=$(echo -n ${PATT2} | cut -c 7-14)
 P2=$(echo -n ${PATT2} | cut -c 3-6)
 echo "PAT2: $PATT2   P0: $P0   P1: $P1   P2: $P2"
-${prefix}o2-roc-reg-write --id=${addr} --ch=2 --address=0026001C --val=0x${P0}
-${prefix}o2-roc-reg-write --id=${addr} --ch=2 --address=00260020 --val=0x${P1}
-${prefix}o2-roc-reg-write --id=${addr} --ch=2 --address=00260024 --val=0x${P2}
+${prefix}o2-roc-reg-write --id=${addr} --ch=2 --address=0x26001C --val=0x${P0}
+${prefix}o2-roc-reg-write --id=${addr} --ch=2 --address=0x260020 --val=0x${P1}
+${prefix}o2-roc-reg-write --id=${addr} --ch=2 --address=0x260024 --val=0x${P2}
 
 # PAT 1 LENGTH
-${prefix}o2-roc-reg-write --id=${addr} --ch=2 --address=00260028 --val=0x1
+${prefix}o2-roc-reg-write --id=${addr} --ch=2 --address=0x260028 --val=0x1
 # PAT 1 DELAY
-${prefix}o2-roc-reg-write --id=${addr} --ch=2 --address=0026002C --val=0x0
+${prefix}o2-roc-reg-write --id=${addr} --ch=2 --address=0x26002C --val=0x0
 # PAT 2 LENGTH
-${prefix}o2-roc-reg-write --id=${addr} --ch=2 --address=00260030 --val=0x1
+${prefix}o2-roc-reg-write --id=${addr} --ch=2 --address=0x260030 --val=0x1
 # PAT 3 LENGTH
-${prefix}o2-roc-reg-write --id=${addr} --ch=2 --address=00260044 --val=0x1
+${prefix}o2-roc-reg-write --id=${addr} --ch=2 --address=0x260044 --val=0x1
 
 #### TRIGGER MASK ... NOT CODE ANYMORE
 # PAT 1 TRG MASK
-${prefix}o2-roc-reg-write --id=${addr} --ch=2 --address=00260034 --val=${TRIGMASK1}
+${prefix}o2-roc-reg-write --id=${addr} --ch=2 --address=0x260034 --val=${TRIGMASK1}
 # PAT 2 TRG MASK
 echo "${prefix}o2-roc-reg-write --id=${addr} --ch=2 --address=00260038 --val=${TRIGMASK2}"
-${prefix}o2-roc-reg-write --id=${addr} --ch=2 --address=00260038 --val=${TRIGMASK2}
+${prefix}o2-roc-reg-write --id=${addr} --ch=2 --address=0x260038 --val=${TRIGMASK2}
 
 #### TIME_STAMP
 # PAT 2 TIME STAMP TF[31:20] ORBIT[19:12] BC[11:0]
-${prefix}o2-roc-reg-write --id=${addr} --ch=2 --address=00260040 --val=${TSTAMP}
+${prefix}o2-roc-reg-write --id=${addr} --ch=2 --address=0x260040 --val=0x0
+${prefix}o2-roc-reg-write --id=${addr} --ch=2 --address=0x260040 --val=${TSTAMP}
 
 done
